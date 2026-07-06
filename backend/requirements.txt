@@ -1,0 +1,6 @@
+# Dependencies
+fastapi
+uvicorn
+requests
+syncedlyrics
+yt-dlp

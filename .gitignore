@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.next/
+
+# Backend
+__pycache__/
+*.pyc
+backend/downloads/*.m4a
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env.local
+.env*.local
+
+# Cache
+*.log
+backend/__pycache__/
+
+# Keep downloads dir but not files
+backend/downloads/*.m4a
+backend/downloads/*.mp4
+backend/downloads/*.mp3
