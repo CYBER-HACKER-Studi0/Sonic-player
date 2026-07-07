@@ -139,14 +139,14 @@ else
 fi
 
 info "Installing: fastapi, uvicorn, requests, syncedlyrics, yt-dlp..."
-info "This may take 1-3 minutes on first run..."
-
-# Install with visible progress (no -q flag)
+echo ""
 if [ "$OS" = "termux" ]; then
-  $PYTHON -m pip install -r backend/requirements.txt 2>&1 | tail -5
+  $PYTHON -m pip install -r backend/requirements.txt 2>&1
 else
-  $PIP install --break-system-packages -r backend/requirements.txt 2>&1 | tail -5
+  $PIP install --break-system-packages -r backend/requirements.txt 2>&1
 fi
+echo ""
+PYEXIT=$?
 
 if $PYTHON -c "import fastapi, uvicorn, yt_dlp, syncedlyrics" 2>/dev/null; then
   ok "All Python packages installed"
@@ -163,23 +163,16 @@ fi
 step "3/5  Installing Frontend (npm) Packages"
 
 info "Installing Next.js, React, and dependencies..."
+echo ""
 if [ -d "node_modules" ]; then
   ok "node_modules already exists — skipping npm install"
 else
-  npm install 2>&1 | tail -1 >/dev/null &
-  PID=$!
-  spinner $PID "npm install (this may take a minute)..."
-  wait $PID 2>/dev/null || true
-
+  npm install 2>&1
+  echo ""
   if [ -d "node_modules/.bin/next" ] || [ -f "node_modules/.bin/next" ]; then
     ok "Frontend dependencies installed"
   else
-    npm install 2>&1 | tail -5
-    if [ -d "node_modules" ]; then
-      ok "Frontend dependencies installed"
-    else
-      fail "npm install failed. Check your internet connection."
-    fi
+    fail "npm install failed. Check your internet connection."
   fi
 fi
 
@@ -196,11 +189,10 @@ if [ -d ".next" ]; then
   info "Existing build found — rebuilding..."
 fi
 
-npx next build 2>&1 | tail -3 &
-PID=$!
-spinner $PID "Building Sonic Player (this may take a while)..."
-wait $PID 2>/dev/null || true
-
+info "Building Sonic Player..."
+echo ""
+npx next build 2>&1
+echo ""
 if [ -d ".next" ]; then
   ok "Build complete! ✓"
 else
