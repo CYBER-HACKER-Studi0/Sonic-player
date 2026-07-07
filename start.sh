@@ -18,6 +18,8 @@ echo -e "  ${CYAN}┌───────────────────�
 echo -e "  ${CYAN}│${NC}  ${BOLD}🎵 Sonic Player${NC}          ${CYAN}│${NC}"
 echo -e "  ${CYAN}│${NC}  by CYBER-HACKER-Studio   ${CYAN}│${NC}"
 echo -e "  ${CYAN}└──────────────────────────┘${NC}"
+echo -e "  ${YELLOW}⚠ For personal/educational use only.${NC}"
+echo -e "  ${YELLOW}  Users must comply with YouTube ToS.${NC}"
 echo ""
 
 # ── Check if install needed ──

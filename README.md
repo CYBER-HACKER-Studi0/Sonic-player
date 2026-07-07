@@ -150,7 +150,14 @@ Contributions are welcome! Feel free to open issues or pull requests.
 
 ## ⚠️ Disclaimer
 
-Sonic Player uses yt-dlp for streaming audio from YouTube. This project is for **educational purposes**. Users are responsible for complying with YouTube's Terms of Service.
+This project uses **yt-dlp** to stream audio from YouTube for **personal and educational use only**.
+
+- 🚫 **Not affiliated with or endorsed by YouTube/Google**
+- 🚫 **Does not bypass copyright or replace official streaming**
+- ⚠️ **Users are solely responsible** for complying with YouTube's Terms of Service and applicable copyright laws
+- 🔍 **yt-dlp** is an optional dependency — the app also supports Jamendo (licensed music) and local file playback
+
+The developer provides this software as-is for educational purposes and assumes **no liability** for misuse or Terms of Service violations. If you have concerns about copyright, please use the Jamendo API or your own local files.
 
 ---
 
