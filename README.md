@@ -61,11 +61,11 @@
 ## 🎬 Promo Video
 
 <div align="center">
-  <video src="sonic_promo_final.mp4" controls width="720" poster="promo/1_home.png">
-    Your browser doesn't support video. <a href="sonic_promo_final.mp4">Download MP4</a>
-  </video>
-  <br>
-  <sub>🎵 40-second promo · 1920×1080</sub>
+  <a href="sonic_promo_final.mp4" target="_blank">
+    <img src="promo/1_home.png" width="720" alt="Click to watch promo video" style="border-radius:12px;border:1px solid rgba(255,255,255,0.1)">
+    <br>
+    <sub>▶️ Click to watch — 40-second promo · 1920×1080</sub>
+  </a>
   <br><br>
   <p><b>SONIC PLAYER</b> — Modern music streaming app built with Next.js & FastAPI</p>
   <p>🔍 Search millions of YouTube tracks · 🧠 AI smart recommendations · 📥 Offline downloads</p>
