@@ -52,7 +52,14 @@
     Your browser doesn't support video. <a href="sonic_promo_final.mp4">Download MP4</a>
   </video>
   <br>
-  <sub>40-second promo · 1920×1080</sub>
+  <sub>🎵 40-second promo · 1920×1080</sub>
+  <br><br>
+  <p><b>SONIC PLAYER</b> — Modern music streaming app built with Next.js & FastAPI</p>
+  <p>🔍 Search millions of YouTube tracks · 🧠 AI smart recommendations · 📥 Offline downloads</p>
+  <p>🎨 7 real-time visualizers · 📋 Playlists with album art · 📜 Synced lyrics</p>
+  <p>⚡ Seamless playback with pre-buffering · 📱 Runs on Termux (Android)</p>
+  <br>
+  <sub>✦ by <b>CYBER · HACKER · Studio</b> ✦</sub>
 </div>
 
 ---
