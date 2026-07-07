@@ -127,7 +127,12 @@ cd "$(dirname "$0")"
 
 if [ "$OS" = "termux" ]; then
   PYTHON=python
-  PIP=pip
+  PIP="python -m pip"
+  # Install pip if missing
+  if ! $PYTHON -m pip --version &>/dev/null; then
+    info "Installing python-pip..."
+    pkg install -y python-pip 2>&1 | tail -1 >/dev/null
+  fi
 else
   PYTHON=python3
   PIP=pip3

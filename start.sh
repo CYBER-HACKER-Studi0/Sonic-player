@@ -29,10 +29,17 @@ if [ ! -d "node_modules" ] || [ ! -f "backend/requirements.txt" ]; then
   echo ""
 fi
 
+# ── Detect Python command ──
+if command -v python3 &>/dev/null; then
+  PYTHON=python3
+else
+  PYTHON=python
+fi
+
 # ── Start Backend ──
 echo -e "  ${GREEN}━━━${NC} ${BOLD}Starting Backend (port 8005)...${NC}"
 cd backend
-python3 main.py &
+$PYTHON main.py &
 BACKEND_PID=$!
 cd ..
 sleep 2
