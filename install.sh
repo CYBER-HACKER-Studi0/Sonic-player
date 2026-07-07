@@ -139,16 +139,14 @@ else
 fi
 
 info "Installing: fastapi, uvicorn, requests, syncedlyrics, yt-dlp..."
+info "This may take 1-3 minutes on first run..."
 
+# Install with visible progress (no -q flag)
 if [ "$OS" = "termux" ]; then
-  $PIP install --quiet fastapi uvicorn requests syncedlyrics yt-dlp 2>&1 | tail -1 >/dev/null &
+  $PYTHON -m pip install -r backend/requirements.txt 2>&1 | tail -5
 else
-  $PIP install --break-system-packages --quiet fastapi uvicorn requests syncedlyrics yt-dlp 2>&1 | tail -1 >/dev/null &
+  $PIP install --break-system-packages -r backend/requirements.txt 2>&1 | tail -5
 fi
-
-PID=$!
-spinner $PID "Installing Python packages..."
-wait $PID 2>/dev/null || true
 
 if $PYTHON -c "import fastapi, uvicorn, yt_dlp, syncedlyrics" 2>/dev/null; then
   ok "All Python packages installed"
