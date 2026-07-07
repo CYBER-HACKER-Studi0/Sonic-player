@@ -7,8 +7,8 @@
 set +e  # Don't exit on error - we handle them
 
 # ── Kill any existing processes on our ports ──
-fuser -k 8005/tcp 2>/dev/null
-fuser -k 3004/tcp 2>/dev/null
+fuser -k 8005/tcp 2>/dev/null >/dev/null
+fuser -k 3004/tcp 2>/dev/null >/dev/null
 sleep 1
 
 RED='\033[0;31m'
