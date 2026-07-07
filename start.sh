@@ -4,7 +4,12 @@
 # Starts both Frontend (Next.js :3004) + Backend (FastAPI :8005)
 # ═══════════════════════════════════════════════════════════
 
-set -e
+set +e  # Don't exit on error - we handle them
+
+# ── Kill any existing processes on our ports ──
+fuser -k 8005/tcp 2>/dev/null
+fuser -k 3004/tcp 2>/dev/null
+sleep 1
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'

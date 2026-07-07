@@ -135,7 +135,14 @@ if [ "$OS" = "termux" ]; then
   fi
 else
   PYTHON=python3
-  PIP=pip3
+  # Detect pip command properly
+  if command -v pip3 &>/dev/null; then
+    PIP=pip3
+  elif command -v pip &>/dev/null; then
+    PIP=pip
+  else
+    PIP="$PYTHON -m pip"
+  fi
 fi
 
 info "Installing: fastapi, uvicorn, requests, syncedlyrics, yt-dlp..."
@@ -143,7 +150,8 @@ echo ""
 if [ "$OS" = "termux" ]; then
   $PYTHON -m pip install -r backend/requirements.txt 2>&1
 else
-  $PIP install --break-system-packages -r backend/requirements.txt 2>&1
+  # Try normal pip first, fallback to --break-system-packages
+  $PIP install -r backend/requirements.txt 2>&1 || $PIP install --break-system-packages -r backend/requirements.txt 2>&1
 fi
 echo ""
 PYEXIT=$?
