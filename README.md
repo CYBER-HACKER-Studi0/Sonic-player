@@ -158,6 +158,20 @@ sonic-player/
 
 ---
 
+## 🏢 About CYBER · HACKER · Studio
+
+**CYBER · HACKER · Studio** is an indie development studio focused on building 
+modern applications and open-source tools. We specialize in:
+
+- 📱 **Android App Development** — Native Kotlin/Jetpack Compose
+- 🎵 **Media Applications** — Music streaming, video processing
+- 🛠️ **Developer Tools** — CLI utilities, productivity apps
+- 🌐 **Open Source** — Free tools for the community
+
+Our mission is to build high-quality, practical software that pushes boundaries.
+
+---
+
 ## ⚠️ Disclaimer
 
 This project uses **yt-dlp** for educational purposes only. Users are responsible for complying with YouTube's Terms of Service. yt-dlp is optional — the app also supports Jamendo (licensed) and local file playback.
