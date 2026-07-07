@@ -1,68 +1,109 @@
-# Sonic Player 🎵
+<div align="center">
+  <br>
+  <h1>🎵 SONIC PLAYER</h1>
+  <p><b>Modern Music Streaming Application</b></p>
+  <p>Search · Stream · Download · Visualize</p>
+  <br>
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black) ![TypeScript](https://img.shields.io/badge/TypeScript-6-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-Python-green) ![License](https://img.shields.io/badge/License-MIT-gold)
+  <!-- Badges -->
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js">
+  <img src="https://img.shields.io/badge/TypeScript-6-blue?style=flat-square&logo=typescript">
+  <img src="https://img.shields.io/badge/FastAPI-Python-green?style=flat-square&logo=fastapi">
+  <img src="https://img.shields.io/badge/License-MIT-gold?style=flat-square">
+  <br><br>
 
-**Sonic Player** is a modern, feature-rich music streaming application with a sleek dark/gold interface. Search and stream music from YouTube, view synchronized lyrics, manage playlists, and enjoy a premium listening experience.
+  <!-- Social Links -->
+  <a href="https://youtube.com/@cyberhackerstudio-k5c"><img src="https://img.shields.io/badge/YouTube-red?style=social&logo=youtube"></a>
+  <a href="https://www.instagram.com/cyberhackerstudio980"><img src="https://img.shields.io/badge/Instagram-pink?style=social&logo=instagram"></a>
+  <a href="https://www.facebook.com/share/1D5X7FDbNh/"><img src="https://img.shields.io/badge/Facebook-blue?style=social&logo=facebook"></a>
+  <a href="https://t.me/cyberhackerstudio"><img src="https://img.shields.io/badge/Telegram-skyblue?style=social&logo=telegram"></a>
+  <a href="https://vt.tiktok.com/ZSCnEcBJH/"><img src="https://img.shields.io/badge/TikTok-black?style=social&logo=tiktok"></a>
+  <br><br>
 
-Built with **Next.js 16** (frontend) + **FastAPI** (backend).
+  <!-- CYBER-HACKER-Badge -->
+  <sub>✦ Built by <b>CYBER · HACKER · Studio</b> ✦</sub>
+</div>
+
+<br>
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="promo/1_home.png" width="400" alt="Home"><br><sub>Home Screen</sub></td>
+      <td><img src="promo/2_search.png" width="400" alt="Search"><br><sub>Search Results</sub></td>
+    </tr>
+    <tr>
+      <td><img src="promo/3_player.png" width="400" alt="Player"><br><sub>Now Playing + Visualizer</sub></td>
+      <td><img src="promo/4_library.png" width="400" alt="Library"><br><sub>Library & Playlists</sub></td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## 🎬 Promo Video
+
+<div align="center">
+  <video src="sonic_promo_final.mp4" controls width="720" poster="promo/1_home.png">
+    Your browser doesn't support video. <a href="sonic_promo_final.mp4">Download MP4</a>
+  </video>
+  <br>
+  <sub>40-second promo · 1920×1080</sub>
+</div>
+
+---
+
+## 🌐 Connect With Us
+
+| Platform | Link |
+|----------|------|
+| 🟦 **YouTube** | [CYBER-HACKER Studio](https://youtube.com/@cyberhackerstudio-k5c) |
+| 🟪 **Instagram** | [@cyberhackerstudio980](https://www.instagram.com/cyberhackerstudio980) |
+| 🔵 **Facebook** | [CYBER-HACKER Studio](https://www.facebook.com/share/1D5X7FDbNh/) |
+| 🔷 **Telegram** | [@cyberhackerstudio](https://t.me/cyberhackerstudio) |
+| ⬛ **TikTok** | [CYBER-HACKER Studio](https://vt.tiktok.com/ZSCnEcBJH/) |
+| ⭐ **GitHub** | [CYBER-HACKER-Studi0](https://github.com/CYBER-HACKER-Studi0) |
 
 ---
 
 ## ✨ Features
 
-- 🔍 **Smart Search** — Search music across YouTube with grouped results (artists, albums, tracks)
-- ▶️ **Audio Streaming** — Stream high-quality audio directly in the browser
-- 🎬 **Video Mode** — Watch music videos inline
-- 📜 **Synced Lyrics** — Auto-scrolling lyrics with LRC support (powered by syncedlyrics)
-- 📥 **Downloads** — Save tracks and videos locally for offline playback
-- ❤️ **Liked Tracks** — Save favorites to your personal library
-- 📋 **Playlists** — Create and manage custom playlists
-- 🎨 **Visualizer** — Real-time audio visualization with particle effects
-- 🌙 **Dark/Gold Theme** — Premium warm-night aesthetic
-- ⚡ **Fast Backend** — yt-dlp with intelligent caching for sub-second stream loading
-
----
-
-## 🖼️ Screenshots
-
-![Sonic Player](https://img.youtube.com/vi/hqdefault.jpg)
+| Feature | Description |
+|---------|-------------|
+| 🔍 **YouTube Search** | Search millions of tracks. Choose 20–200 results |
+| 🧠 **Smart Recommendations** | AI-powered suggestions based on listening history |
+| 🎬 **YouTube Playlists** | Browse channels as playlists |
+| 📥 **Offline Downloads** | Save tracks & play them without internet |
+| 🎨 **7 Visualizers** | Bars, Wave, Circle, Fire, Aurora, Plasma, Rings |
+| 📋 **Playlists** | Create & manage with album art thumbnails |
+| 📜 **Synced Lyrics** | Auto-scrolling LRC support |
+| ⚡ **Preloader** | Next track buffers while current plays — instant switching |
+| 📱 **Termux Support** | Runs on Android via Termux |
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- **Node.js** 18+ 
-- **Python** 3.10+
-- **yt-dlp** — `pip install yt-dlp`
-- **ffmpeg** — `sudo apt install ffmpeg`
-
-### Setup
-
 ```bash
-# 📱 One-command install (recommended)
+# One-command install (recommended)
 bash install.sh
 
-# ▶️ Start
+# Start
 bash start.sh
 ```
 
-### Manual Setup
+### Manual
 
 ```bash
-# 1. Clone
-git clone https://github.com/CYBER-HACKER-Studio/sonic-player.git
-cd sonic-player
-
-# 2. Frontend
+git clone https://github.com/CYBER-HACKER-Studi0/Sonic-player.git
+cd Sonic-player
 npm install
 npm run build
-
-# 3. Backend
 pip install -r backend/requirements.txt
-
-# 4. Run
 python3 backend/main.py &
 npx next start -p 3004
 ```
@@ -70,21 +111,14 @@ npx next start -p 3004
 ### Termux (Android)
 
 ```bash
-# Install Termux packages
 pkg install nodejs python ffmpeg
-
-# Clone & install
-git clone https://github.com/CYBER-HACKER-Studio/sonic-player.git
-cd sonic-player
+git clone https://github.com/CYBER-HACKER-Studi0/Sonic-player.git
+cd Sonic-player
 bash install.sh
-
-# Run
 bash start.sh
 ```
 
 Open **http://localhost:3004** in your browser.
-
-> ⚡ Downloaded tracks play from the local folder — no internet needed.
 
 ---
 
@@ -92,75 +126,26 @@ Open **http://localhost:3004** in your browser.
 
 ```
 sonic-player/
-├── app/                    # Next.js frontend
-│   ├── components/         # React components
-│   │   ├── AudioEngine.tsx    # Audio playback engine
-│   │   ├── NowPlaying.tsx     # Now playing screen
-│   │   ├── SearchView.tsx     # Search interface
-│   │   ├── Sidebar.tsx        # Navigation sidebar
-│   │   ├── PlayerBar.tsx      # Bottom player bar
-│   │   ├── LyricsPanel.tsx    # Synced lyrics display
-│   │   ├── Visualizer.tsx     # Audio visualizer
-│   │   ├── LibraryView.tsx    # Library (likes/downloads)
-│   │   ├── PlaylistPanel.tsx  # Playlist management
-│   │   ├── HomeView.tsx       # Home/landing view
-│   │   ├── SettingsPanel.tsx  # Settings panel
-│   │   └── VideoModal.tsx     # Video player modal
-│   ├── layout.tsx          # Root layout
-│   ├── page.tsx            # Main page
-│   └── globals.css         # Global styles
-├── backend/                # FastAPI backend
-│   ├── main.py             # API server
-│   └── downloads/          # Local downloads
-├── lib/                    # Shared utilities
-│   ├── api.ts              # API client
-│   ├── player-store.tsx    # Zustand player state
-│   ├── storage.ts          # localStorage helpers
-│   └── settings.ts         # App settings
-└── public/                 # Static assets
+├── app/components/      # React components (16 files)
+├── backend/              # FastAPI server + downloads
+├── lib/                  # State, API, storage, preloader
+├── promo/                # Screenshots for README
+├── demo.html             # Live demo page
+├── install.sh            # Termux/Linux installer
+├── start.sh              # Quick launcher
+└── README.md
 ```
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | Next.js 16, React 18, TypeScript |
-| **Styling** | Tailwind CSS 4, Radix UI |
-| **State** | Zustand 5 |
-| **Animation** | Framer Motion |
-| **Backend** | FastAPI (Python) |
-| **Streaming** | yt-dlp, FFmpeg |
-| **Lyrics** | syncedlyrics LRC |
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to open issues or pull requests.
 
 ---
 
 ## ⚠️ Disclaimer
 
-This project uses **yt-dlp** to stream audio from YouTube for **personal and educational use only**.
-
-- 🚫 **Not affiliated with or endorsed by YouTube/Google**
-- 🚫 **Does not bypass copyright or replace official streaming**
-- ⚠️ **Users are solely responsible** for complying with YouTube's Terms of Service and applicable copyright laws
-- 🔍 **yt-dlp** is an optional dependency — the app also supports Jamendo (licensed music) and local file playback
-
-The developer provides this software as-is for educational purposes and assumes **no liability** for misuse or Terms of Service violations. If you have concerns about copyright, please use the Jamendo API or your own local files.
+This project uses **yt-dlp** for educational purposes only. Users are responsible for complying with YouTube's Terms of Service. yt-dlp is optional — the app also supports Jamendo (licensed) and local file playback.
 
 ---
 
 <div align="center">
-  <sub>Built by <a href="https://cyber-hacker.studio">CYBER·HACKER Studio</a> 🖤</sub>
+  <sub>Built by <a href="https://github.com/CYBER-HACKER-Studi0">CYBER·HACKER·Studio</a></sub>
+  <br>
+  <sub>© 2026 CYBER·HACKER·Studio. All rights reserved.</sub>
 </div>
