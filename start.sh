@@ -41,6 +41,15 @@ else
   PYTHON=python
 fi
 
+# ── Detect OS ──
+if [ -n "$TERMUX_VERSION" ]; then
+  IS_TERMUX=true
+  NEXT_CMD="npx next dev -p 3004 --webpack"
+else
+  IS_TERMUX=false
+  NEXT_CMD="npx next start -p 3004"
+fi
+
 # ── Start Backend ──
 echo -e "  ${GREEN}━━━${NC} ${BOLD}Starting Backend (port 8005)...${NC}"
 cd backend
@@ -57,13 +66,29 @@ fi
 
 # ── Start Frontend ──
 echo -e "  ${GREEN}━━━${NC} ${BOLD}Starting Frontend (port 3004)...${NC}"
-npx next start -p 3004 &
-FRONTEND_PID=$!
-sleep 3
-if kill -0 "$FRONTEND_PID" 2>/dev/null; then
-  echo -e "  ${GREEN}✓${NC} Frontend running on http://localhost:3004"
+
+if [ "$IS_TERMUX" = true ]; then
+  # Termux: use dev mode with Webpack (Turbopack doesn't support ARM64)
+  echo -e "  ${CYAN}→${NC} Termux detected — using Webpack mode"
+  $NEXT_CMD &
+  FRONTEND_PID=$!
+  sleep 5
+elif [ -d ".next" ]; then
+  # Has production build
+  $NEXT_CMD &
+  FRONTEND_PID=$!
+  sleep 3
+  if kill -0 "$FRONTEND_PID" 2>/dev/null; then
+    echo -e "  ${GREEN}✓${NC} Frontend running on http://localhost:3004"
+  else
+    echo -e "  ${YELLOW}⚠${NC} Production start failed — trying dev mode..."
+    npx next dev -p 3004 &
+    FRONTEND_PID=$!
+    sleep 4
+  fi
 else
-  echo -e "  ${YELLOW}⚠${NC} Frontend starting... trying dev mode"
+  # No build — dev mode
+  echo -e "  ${CYAN}→${NC} No production build found — starting dev mode"
   npx next dev -p 3004 &
   FRONTEND_PID=$!
   sleep 4
