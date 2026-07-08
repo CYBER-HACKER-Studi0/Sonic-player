@@ -128,18 +128,18 @@ python3 backend/server.py &
 npx next start -p 3004
 ```
 
-### 📱 Termux (Android) — أمر واحد!
+### 📱 Termux (Android) — One command!
 
 ```bash
 pkg install wget -y && wget https://raw.githubusercontent.com/CYBER-HACKER-Studi0/Sonic-player/main/setup-termux.sh && sh setup-termux.sh
 ```
 
-بعد ما يخلص، شغّل:
+After setup completes, start with:
 ```bash
 sh start.sh
 ```
 
-> **ملاحظة:** الـ backend الجديد (server.py) معتمد على Python stdlib بالكامل — مش محتاج pydantic, fastapi, ولا syncedlyrics. ولا حاجة Rust خالص! 🎉
+> **Note:** The new backend (server.py) uses Python stdlib only — no pydantic, fastapi, syncedlyrics, or Rust required! 🎉
 
 Open **http://localhost:3004** in your browser.
 

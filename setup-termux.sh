@@ -1,10 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ═══════════════════════════════════════════════════════════
-# Sonic Player — Termux Full Installation Script
-# من أول تثبيت Termux للتحديثات للتشغيل
+# Sonic Player — Termux One-Click Setup
+# Installs everything: pkg packages, yt-dlp, git clone, npm, build
 # ═══════════════════════════════════════════════════════════
-
-# من غير set -e عشان نتعامل مع الأخطاء بنفسنا
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -21,9 +19,7 @@ print_banner() {
   echo -e "  ${PURPLE}║${NC}  by CYBER-HACKER-Studio           ${PURPLE}║${NC}"
   echo -e "  ${PURPLE}╚══════════════════════════════════════╝${NC}"
   echo ""
-  echo -e "  ${YELLOW}⚠  تأكد إنك شغال على Termux${NC}"
-  echo -e "  ${YELLOW}   مساحة تخزين فارغة: 500MB+${NC}"
-  echo -e "  ${YELLOW}   نت مستقر (فيش او واي فاي)${NC}"
+  echo -e "  ${YELLOW}⚠ Requires: Termux + 500MB free + stable internet${NC}"
   echo ""
 }
 
@@ -33,143 +29,139 @@ ok()     { echo -e "  ${GREEN}✓${NC} $1"; }
 warn()   { echo -e "  ${YELLOW}⚠${NC} $1"; }
 fail()   { echo -e "  ${RED}✗${NC} $1"; }
 
-# ── التحقق من Termux ──
+# ── Check Termux ──
 if [ -z "$TERMUX_VERSION" ]; then
-  echo -e "\n  ${RED}✗✗✗ مش عارف أexecute الـ script ده غير على Termux${NC}"
-  echo -e "  ${RED}   روح نزل Termux من F-Droid الأول${NC}\n"
+  echo -e "\n  ${RED}✗ This script only runs on Termux${NC}"
+  echo -e "  ${RED}   Install Termux from F-Droid first${NC}\n"
   exit 1
 fi
 
-# ── منح صلاحيات التخزين (مرة واحدة) ──
+# ── Storage permission (one-time) ──
 termux-setup-storage 2>/dev/null || true
 sleep 1
 
-# ── 1. تحديث Termux ──
+# ── 1. Update Termux ──
 print_banner
-step "1/7  تحديث Termux"
+step "1/7  Updating Termux"
 
-info "بحدث الحزم..."
+info "Updating package lists..."
 yes | pkg update 2>&1 | tail -2
 
-# إصلاح أي حزم مكسورة قبل الـ upgrade
-info "بصلح أي حزم مكسورة..."
+# Fix any broken packages before upgrade
+info "Fixing broken packages..."
 apt --fix-broken install -y 2>/dev/null || true
 dpkg --configure -a 2>/dev/null || true
 
+info "Upgrading packages (this may take a while)..."
 yes | pkg upgrade -y 2>&1 | tail -2
-# لو الـ upgrade فشل بسبب حزمة مكسورة، نصلحها ونجرب تاني
 if [ $? -ne 0 ]; then
-  warn "في مشكلة تحديث — بحاول أصلح..."
+  warn "Upgrade failed — retrying with fix..."
   apt --fix-broken install -y 2>/dev/null
   dpkg --configure -a 2>/dev/null
   yes | pkg upgrade -y 2>&1 | tail -2 || true
 fi
-ok "Termux أخر إصدار ✓"
+ok "Termux is up to date ✓"
 
-# ── 2. الحزم الأساسية ──
-step "2/7  تثبيت الحزم الأساسية"
+# ── 2. Install base packages ──
+step "2/7  Installing Base Packages"
 
 PACKAGES="python nodejs ffmpeg git curl"
 for pkg in $PACKAGES; do
   if command -v "$pkg" &>/dev/null; then
-    ok "$pkg موجود بالفعل"
+    ok "$pkg already installed"
   else
-    info "بتنزيل $pkg..."
+    info "Installing $pkg..."
     apt-get install -y "$pkg" 2>&1 | tail -1 || {
-      warn "$pkg فشل في التثبيت — بحاول مرة تانية"
+      warn "$pkg failed — retrying..."
       apt-get install -y "$pkg" 2>&1 | tail -1 || true
     }
   fi
 done
 
-# التأكد إن ffmpeg شغال
+# Verify ffmpeg works
 if command -v ffmpeg &>/dev/null; then
   ok "ffmpeg $(ffmpeg -version 2>&1 | head -1 | grep -oP 'version \K[^ ]+' || echo '✓')"
 else
-  warn "ffmpeg مش شغال — ممكن اللينكات القديمة"
-  info "بحاول أعيد تثبيت ffmpeg..."
+  warn "ffmpeg broken — reinstalling..."
   apt-get remove -y ffmpeg 2>/dev/null || true
   apt-get autoremove -y 2>/dev/null || true
   apt-get install -y ffmpeg 2>&1 | tail -1 || true
 fi
 
-# ── 3. تثبيت yt-dlp ──
-step "3/7  تثبيت yt-dlp"
+# ── 3. Install yt-dlp ──
+step "3/7  Installing yt-dlp"
 
 if command -v yt-dlp &>/dev/null; then
   VER=$(yt-dlp --version 2>/dev/null | head -1)
-  ok "yt-dlp موجود ($VER)"
+  ok "yt-dlp already installed ($VER)"
 else
-  info "بتنزيل yt-dlp..."
-  # طريقة 1: pkg
+  info "Installing yt-dlp..."
+  # Method 1: pkg
   apt-get install -y yt-dlp 2>&1 | tail -1 || \
-  # طريقة 2: pip
+  # Method 2: pip
   pip install yt-dlp 2>&1 | tail -1 || true
   
   if command -v yt-dlp &>/dev/null; then
-    ok "yt-dlp تم ✓"
+    ok "yt-dlp installed ✓"
   else
-    warn "yt-dlp مفيهوش تنزيل — جرب بعدين: pkg install yt-dlp"
+    warn "yt-dlp install failed. Try later: pkg install yt-dlp"
   fi
 fi
 
-# ── 4. تحميل المشروع ──
-step "4/7  تحميل Sonic Player"
+# ── 4. Clone project ──
+step "4/7  Downloading Sonic Player"
 
 if [ -d "Sonic-player" ]; then
-  info "المشروع موجود — بتحدث..."
+  info "Project exists — updating..."
   cd Sonic-player
   git pull 2>&1 | tail -1
 else
-  info "بتحميل المشروع..."
+  info "Cloning repository..."
   git clone https://github.com/CYBER-HACKER-Studi0/Sonic-player.git 2>&1 | tail -1
   cd Sonic-player
 fi
-ok "المشروع جاهز ✓"
+ok "Project ready ✓"
 
-# ── 5. تثبيت npm packages ──
-step "5/7  تثبيت حزم الواجهة (npm)"
+# ── 5. Install npm packages ──
+step "5/7  Installing Frontend (npm)"
 
 if [ ! -d "node_modules" ]; then
-  info "بتنزيل dependencies..."
+  info "Installing dependencies..."
   npm install 2>&1 | tail -3
   if [ -d "node_modules" ]; then
-    ok "npm packages تم ✓"
+    ok "npm packages installed ✓"
   else
-    warn "npm install فشل — بحاول بـ --legacy-peer-deps"
+    warn "npm install failed — retrying with --legacy-peer-deps"
     npm install --legacy-peer-deps 2>&1 | tail -3
   fi
 else
-  ok "node_modules موجود"
+  ok "node_modules exists"
 fi
 
 # ── 6. Build ──
-step "6/7  بناء المشروع"
+step "6/7  Building Frontend"
 
-info "بتبني الواجهة..."
+info "Running next build..."
 npx next build 2>&1 | tail -3
 if [ -d ".next" ]; then
-  ok "البناء تم ✓"
+  ok "Build complete ✓"
 else
-  warn "البناء فشل — ممكن تشغله بـ: npx next dev -p 3004"
+  warn "Build failed — run manually: npx next dev -p 3004"
 fi
 
 # ── 7. Downloads folder ──
 mkdir -p backend/downloads
-ok "مجلد التحميلات جاهز ✓"
+ok "Downloads folder ready ✓"
 
-# ── خلاص ──
+# ── Done ──
 echo ""
 echo -e "  ${GREEN}╔══════════════════════════════════════╗${NC}"
-echo -e "  ${GREEN}║${NC}  🎵 ${BOLD}Sonic Player جاهز!${NC}            ${GREEN}║${NC}"
+echo -e "  ${GREEN}║${NC}  🎵 ${BOLD}Sonic Player is ready!${NC}         ${GREEN}║${NC}"
 echo -e "  ${GREEN}║${NC}                                     ${GREEN}║${NC}"
-echo -e "  ${GREEN}║${NC}  شغّل بـ:                            ${GREEN}║${NC}"
+echo -e "  ${GREEN}║${NC}  Start with:                         ${GREEN}║${NC}"
 echo -e "  ${GREEN}║${NC}  ${CYAN}sh start.sh${NC}                       ${GREEN}║${NC}"
 echo -e "  ${GREEN}║${NC}                                     ${GREEN}║${NC}"
 echo -e "  ${GREEN}║${NC}  🌐  Frontend → http://localhost:3004 ${GREEN}║${NC}"
 echo -e "  ${GREEN}║${NC}  ⚙️   Backend  → http://localhost:8005 ${GREEN}║${NC}"
-echo -e "  ${GREEN}║${NC}                                     ${GREEN}║${NC}"
-echo -e "  ${GREEN}║${NC}  ${YELLOW}⚠${NC} افتح http://localhost:3004        ${GREEN}║${NC}"
-echo -e "  ${GREEN}║${NC}     على Chrome تلفونك                  ${GREEN}║${NC}"
 echo -e "  ${GREEN}╚══════════════════════════════════════╝${NC}"
 echo ""
