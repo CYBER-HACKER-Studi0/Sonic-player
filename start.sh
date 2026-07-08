@@ -7,8 +7,10 @@
 set +e  # Don't exit on error - we handle them
 
 # ── Kill any existing processes on our ports ──
-fuser -k 8005/tcp 2>/dev/null >/dev/null
-fuser -k 3004/tcp 2>/dev/null >/dev/null
+# Termux-friendly: works everywhere
+pkill -f "python3 server.py" 2>/dev/null
+pkill -f "next dev" 2>/dev/null
+pkill -f "next start" 2>/dev/null
 sleep 1
 
 RED='\033[0;31m'
@@ -57,11 +59,28 @@ $PYTHON server.py &
 BACKEND_PID=$!
 cd ..
 sleep 2
-if kill -0 "$BACKEND_PID" 2>/dev/null; then
+# Check backend with actual HTTP request
+if curl -s http://localhost:8005/health >/dev/null 2>&1; then
   echo -e "  ${GREEN}✓${NC} Backend running on http://localhost:8005"
 else
-  echo -e "  ${RED}✗${NC} Backend failed to start"
-  exit 1
+  # Try waiting a bit more
+  sleep 2
+  if curl -s http://localhost:8005/health >/dev/null 2>&1; then
+    echo -e "  ${GREEN}✓${NC} Backend running on http://localhost:8005"
+  else
+    echo -e "  ${RED}✗${NC} Backend failed to start — trying once more..."
+    pkill -f "python3 server.py" 2>/dev/null
+    sleep 1
+    cd backend && $PYTHON server.py &
+    BACKEND_PID=$!
+    cd ..
+    sleep 3
+    if curl -s http://localhost:8005/health >/dev/null 2>&1; then
+      echo -e "  ${GREEN}✓${NC} Backend running on http://localhost:8005"
+    else
+      echo -e "  ${RED}✗${NC} Backend still not responding. Run manually: cd Sonic-player/backend && python3 server.py"
+    fi
+  fi
 fi
 
 # ── Start Frontend ──
