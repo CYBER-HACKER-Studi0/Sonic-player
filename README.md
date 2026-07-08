@@ -116,27 +116,30 @@ bash install.sh
 bash start.sh
 ```
 
-### Manual
+### Manual (PC/Linux)
 
 ```bash
 git clone https://github.com/CYBER-HACKER-Studi0/Sonic-player.git
 cd Sonic-player
 npm install
 npm run build
-pip install -r backend/requirements.txt
-python3 backend/main.py &
+pip install yt-dlp
+python3 backend/server.py &
 npx next start -p 3004
 ```
 
-### Termux (Android)
+### 📱 Termux (Android) — أمر واحد!
 
 ```bash
-pkg install nodejs python ffmpeg
-git clone https://github.com/CYBER-HACKER-Studi0/Sonic-player.git
-cd Sonic-player
-bash install.sh
-bash start.sh
+pkg install wget -y && wget https://raw.githubusercontent.com/CYBER-HACKER-Studi0/Sonic-player/main/setup-termux.sh && sh setup-termux.sh
 ```
+
+بعد ما يخلص، شغّل:
+```bash
+sh start.sh
+```
+
+> **ملاحظة:** الـ backend الجديد (server.py) معتمد على Python stdlib بالكامل — مش محتاج pydantic, fastapi, ولا syncedlyrics. ولا حاجة Rust خالص! 🎉
 
 Open **http://localhost:3004** in your browser.
 

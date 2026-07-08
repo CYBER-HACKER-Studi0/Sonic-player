@@ -4,7 +4,7 @@
 # من أول تثبيت Termux للتحديثات للتشغيل
 # ═══════════════════════════════════════════════════════════
 
-set -e
+# من غير set -e عشان نتعامل مع الأخطاء بنفسنا
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -47,39 +47,69 @@ sleep 1
 # ── 1. تحديث Termux ──
 print_banner
 step "1/7  تحديث Termux"
+
 info "بحدث الحزم..."
-yes | pkg update 2>&1 | tail -1
-yes | pkg upgrade 2>&1 | tail -1
+yes | pkg update 2>&1 | tail -2
+
+# إصلاح أي حزم مكسورة قبل الـ upgrade
+info "بصلح أي حزم مكسورة..."
+apt --fix-broken install -y 2>/dev/null || true
+dpkg --configure -a 2>/dev/null || true
+
+yes | pkg upgrade -y 2>&1 | tail -2
+# لو الـ upgrade فشل بسبب حزمة مكسورة، نصلحها ونجرب تاني
+if [ $? -ne 0 ]; then
+  warn "في مشكلة تحديث — بحاول أصلح..."
+  apt --fix-broken install -y 2>/dev/null
+  dpkg --configure -a 2>/dev/null
+  yes | pkg upgrade -y 2>&1 | tail -2 || true
+fi
 ok "Termux أخر إصدار ✓"
 
 # ── 2. الحزم الأساسية ──
 step "2/7  تثبيت الحزم الأساسية"
 
-PACKAGES=(python nodejs ffmpeg git curl)
-
-for pkg in "${PACKAGES[@]}"; do
+PACKAGES="python nodejs ffmpeg git curl"
+for pkg in $PACKAGES; do
   if command -v "$pkg" &>/dev/null; then
     ok "$pkg موجود بالفعل"
   else
     info "بتنزيل $pkg..."
-    apt-get install -y "$pkg" 2>&1 | tail -1
-    ok "$pkg تم"
+    apt-get install -y "$pkg" 2>&1 | tail -1 || {
+      warn "$pkg فشل في التثبيت — بحاول مرة تانية"
+      apt-get install -y "$pkg" 2>&1 | tail -1 || true
+    }
   fi
 done
+
+# التأكد إن ffmpeg شغال
+if command -v ffmpeg &>/dev/null; then
+  ok "ffmpeg $(ffmpeg -version 2>&1 | head -1 | grep -oP 'version \K[^ ]+' || echo '✓')"
+else
+  warn "ffmpeg مش شغال — ممكن اللينكات القديمة"
+  info "بحاول أعيد تثبيت ffmpeg..."
+  apt-get remove -y ffmpeg 2>/dev/null || true
+  apt-get autoremove -y 2>/dev/null || true
+  apt-get install -y ffmpeg 2>&1 | tail -1 || true
+fi
 
 # ── 3. تثبيت yt-dlp ──
 step "3/7  تثبيت yt-dlp"
 
 if command -v yt-dlp &>/dev/null; then
-  ok "yt-dlp موجود $(yt-dlp --version 2>/dev/null | head -1)"
+  VER=$(yt-dlp --version 2>/dev/null | head -1)
+  ok "yt-dlp موجود ($VER)"
 else
   info "بتنزيل yt-dlp..."
-  yes | pkg install yt-dlp 2>&1 | tail -1 || apt-get install -y yt-dlp 2>&1 | tail -1 || pip install yt-dlp 2>&1 | tail -1
+  # طريقة 1: pkg
+  apt-get install -y yt-dlp 2>&1 | tail -1 || \
+  # طريقة 2: pip
+  pip install yt-dlp 2>&1 | tail -1 || true
+  
   if command -v yt-dlp &>/dev/null; then
     ok "yt-dlp تم ✓"
   else
-    fail "yt-dlp مفيهوش تنزيل — جرب: pkg install yt-dlp"
-    exit 1
+    warn "yt-dlp مفيهوش تنزيل — جرب بعدين: pkg install yt-dlp"
   fi
 fi
 
@@ -106,7 +136,7 @@ if [ ! -d "node_modules" ]; then
   if [ -d "node_modules" ]; then
     ok "npm packages تم ✓"
   else
-    warn "npm install فشل — جرب: npm install --legacy-peer-deps"
+    warn "npm install فشل — بحاول بـ --legacy-peer-deps"
     npm install --legacy-peer-deps 2>&1 | tail -3
   fi
 else
@@ -116,7 +146,7 @@ fi
 # ── 6. Build ──
 step "6/7  بناء المشروع"
 
-info "بتبني الواجهة (next build)..."
+info "بتبني الواجهة..."
 npx next build 2>&1 | tail -3
 if [ -d ".next" ]; then
   ok "البناء تم ✓"
@@ -139,8 +169,7 @@ echo -e "  ${GREEN}║${NC}                                     ${GREEN}║${NC}
 echo -e "  ${GREEN}║${NC}  🌐  Frontend → http://localhost:3004 ${GREEN}║${NC}"
 echo -e "  ${GREEN}║${NC}  ⚙️   Backend  → http://localhost:8005 ${GREEN}║${NC}"
 echo -e "  ${GREEN}║${NC}                                     ${GREEN}║${NC}"
-echo -e "  ${GREEN}║${NC}  ${YELLOW}⚠ ${NC}بعد أول تشغيل، افتح${NC}                 ${GREEN}║${NC}"
-echo -e "  ${GREEN}║${NC}     http://localhost:3004            ${GREEN}║${NC}"
-echo -e "  ${GREEN}║${NC}     على متصفح Chrome تلفونك          ${GREEN}║${NC}"
+echo -e "  ${GREEN}║${NC}  ${YELLOW}⚠${NC} افتح http://localhost:3004        ${GREEN}║${NC}"
+echo -e "  ${GREEN}║${NC}     على Chrome تلفونك                  ${GREEN}║${NC}"
 echo -e "  ${GREEN}╚══════════════════════════════════════╝${NC}"
 echo ""
