@@ -44,7 +44,7 @@ fi
 # ── Start Backend ──
 echo -e "  ${GREEN}━━━${NC} ${BOLD}Starting Backend (port 8005)...${NC}"
 cd backend
-$PYTHON main.py &
+$PYTHON server.py &
 BACKEND_PID=$!
 cd ..
 sleep 2

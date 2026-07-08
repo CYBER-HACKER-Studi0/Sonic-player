@@ -145,27 +145,29 @@ else
   fi
 fi
 
-info "Installing: fastapi, uvicorn, requests, syncedlyrics, yt-dlp..."
-echo ""
 if [ "$OS" = "termux" ]; then
-  $PYTHON -m pip install -r backend/requirements.txt 2>&1
-else
-  # Try normal pip first, fallback to --break-system-packages
-  $PIP install -r backend/requirements.txt 2>&1 || $PIP install --break-system-packages -r backend/requirements.txt 2>&1
-fi
-echo ""
-PYEXIT=$?
-
-if $PYTHON -c "import fastapi, uvicorn, yt_dlp, syncedlyrics" 2>/dev/null; then
-  ok "All Python packages installed"
-else
-  $PIP install --break-system-packages fastapi uvicorn requests syncedlyrics yt-dlp 2>&1 | tail -3
-  if $PYTHON -c "import fastapi" 2>/dev/null; then
-    ok "Python packages installed"
+  # Termux: install yt-dlp via pkg (no Rust needed!)
+  info "Installing yt-dlp via pkg..."
+  pkg install -y yt-dlp 2>&1 | tail -1 >/dev/null
+  if command -v yt-dlp &>/dev/null; then
+    ok "yt-dlp installed via pkg"
   else
-    fail "Python packages failed to install. Try: $PIP install -r backend/requirements.txt"
+    warn "yt-dlp install via pkg failed, trying pip..."
+    $PYTHON -m pip install yt-dlp 2>&1 | tail -3
   fi
+else
+  # Linux/macOS: only need yt-dlp (stdlib handles everything else)
+  info "Installing yt-dlp..."
+  $PIP install yt-dlp 2>&1 || $PIP install --break-system-packages yt-dlp 2>&1 | tail -3
 fi
+
+if command -v yt-dlp &>/dev/null || $PYTHON -c "import yt_dlp" 2>/dev/null; then
+  ok "yt-dlp ready ✓"
+else
+  warn "yt-dlp not found. Install manually: pkg install yt-dlp (Termux) or pip install yt-dlp"
+fi
+
+ok "Backend uses Python stdlib — zero extra packages needed! ✓"
 
 # ── 3. Node.js Frontend Dependencies ──
 step "3/5  Installing Frontend (npm) Packages"
