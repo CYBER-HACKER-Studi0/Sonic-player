@@ -108,12 +108,20 @@
 
 ## 🚀 Quick Start
 
-```bash
-# One-command install (recommended)
-bash install.sh
+### 🎯 One command — works on PC & Termux!
 
-# Start
-bash start.sh
+```bash
+bash sonic.sh
+```
+
+ده بيعمل كل حاجة: تحديث المشروع ← تثبيت dependencies ← تشغيل backend + frontend.
+
+أو استخدم أوامر منفصلة:
+
+```bash
+bash sonic.sh install   # تثبيت dependencies بس
+bash sonic.sh update    # تحديث المشروع + تثبيت dependencies
+bash sonic.sh start     # تشغيل كل حاجة
 ```
 
 ### Manual (PC/Linux)
