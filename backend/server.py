@@ -122,17 +122,26 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
 
     def _run_ytdlp(self, args, timeout=30):
         """Run yt-dlp with given args, return stdout."""
-        try:
-            result = subprocess.run(
-                ['yt-dlp'] + args,
-                capture_output=True, text=True, timeout=timeout,
-                errors='replace'
-            )
-            return result.stdout.strip(), result.returncode
-        except subprocess.TimeoutExpired:
-            return '', 1
-        except FileNotFoundError:
-            return '', -1
+        # Try direct command first, then python -m fallback
+        commands = [
+            ['yt-dlp'] + args,
+            ['python3', '-m', 'yt_dlp'] + args,
+            ['python', '-m', 'yt_dlp'] + args,
+        ]
+        for cmd in commands:
+            try:
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True, text=True, timeout=timeout,
+                    errors='replace'
+                )
+                if result.returncode == 0 or result.stdout.strip():
+                    return result.stdout.strip(), result.returncode
+            except FileNotFoundError:
+                continue
+            except subprocess.TimeoutExpired:
+                return '', 1
+        return '', -1
 
     def _route(self):
         """Route request to appropriate handler."""
