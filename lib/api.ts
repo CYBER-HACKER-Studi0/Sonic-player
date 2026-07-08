@@ -103,6 +103,10 @@ export async function searchYouTube(query: string, limit = 20, offset = 0): Prom
   try {
     const res = await fetch(url)
     const json = await res.json()
+    if (json.error) {
+      console.warn('Backend error:', json.error)
+      return []  // Still return empty, but at least log it
+    }
     if (!json.results) return []
     return json.results.map((t: any) => ({
       id: t.id,

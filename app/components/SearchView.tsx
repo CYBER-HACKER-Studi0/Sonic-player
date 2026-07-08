@@ -169,6 +169,17 @@ export default function SearchView() {
           </div>
         )}
 
+        {/* No results + not loading + has query */}
+        {query && !loading && results.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <svg className="w-12 h-12 text-sonic-textMuted/30 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+            </svg>
+            <p className="text-sonic-textMuted/60 text-sm">No results for "{query}"</p>
+            <p className="text-sonic-textMuted/30 text-xs mt-1">Make sure the backend is running (port 8005) and yt-dlp is installed</p>
+          </div>
+        )}
+
         {/* Grouped results */}
         {results.length > 0 && groups.map((group) => (
           <div key={group.key} className="mb-6">
