@@ -60,14 +60,17 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
     def _send_json(self, data, status=200):
         """Send JSON response."""
         body = json.dumps(data, ensure_ascii=False).encode('utf-8')
-        self.send_response(status)
-        self.send_header('Content-Type', 'application/json; charset=utf-8')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', '*')
-        self.send_header('Content-Length', str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.send_response(status)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', '*')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # Client disconnected — ignore
 
     def _send_error(self, msg, status=400):
         self._send_json({'error': msg}, status)
@@ -77,15 +80,18 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         if not os.path.isfile(filepath):
             return self._send_error('file not found', 404)
         size = os.path.getsize(filepath)
-        self.send_response(200)
-        self.send_header('Content-Type', media_type)
-        self.send_header('Content-Length', str(size))
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', '*')
-        self.end_headers()
-        with open(filepath, 'rb') as f:
-            self.wfile.write(f.read())
+        try:
+            self.send_response(200)
+            self.send_header('Content-Type', media_type)
+            self.send_header('Content-Length', str(size))
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', '*')
+            self.end_headers()
+            with open(filepath, 'rb') as f:
+                self.wfile.write(f.read())
+        except (BrokenPipeError, ConnectionResetError):
+            pass
 
     def _proxy_stream(self, url):
         """Proxy a URL and stream its content."""
