@@ -46,12 +46,8 @@
 <div align="center">
   <table>
     <tr>
-      <td><img src="promo/1_home.png" width="400" alt="Home"><br><sub>Home Screen</sub></td>
-      <td><img src="promo/2_search.png" width="400" alt="Search"><br><sub>Search Results</sub></td>
-    </tr>
-    <tr>
-      <td><img src="promo/3_player.png" width="400" alt="Player"><br><sub>Now Playing + Visualizer</sub></td>
-      <td><img src="promo/4_library.png" width="400" alt="Library"><br><sub>Library & Playlists</sub></td>
+      <td><img src="promo/clean_home.png" width="400" alt="Home"><br><sub>Home Screen</sub></td>
+      <td><img src="promo/clean_search.png" width="400" alt="Search"><br><sub>Search Results</sub></td>
     </tr>
   </table>
 </div>
@@ -62,7 +58,7 @@
 
 <div align="center">
   <a href="sonic_promo_final.mp4" target="_blank">
-    <img src="promo/1_home.png" width="720" alt="Click to watch promo video" style="border-radius:12px;border:1px solid rgba(255,255,255,0.1)">
+    <img src="promo/clean_home.png" width="720" alt="Click to watch promo video" style="border-radius:12px;border:1px solid rgba(255,255,255,0.1)">
     <br>
     <sub>▶️ Click to watch — 40-second promo · 1920×1080</sub>
   </a>
