@@ -100,9 +100,10 @@ update_project() {
 # 3. Start the backend
 # ─────────────────────────────────────────────────────────
 start_backend() {
-  # Kill any old backend
-  pkill -f "python3 server.py" 2>/dev/null || true
-  sleep 0.5
+  # Kill any old backend — طريقتين عشان نضمن
+  fuser -k 8005/tcp 2>/dev/null || true
+  pkill -f "server.py" 2>/dev/null || true
+  sleep 1
 
   info "Starting backend on port 8005..."
   cd "$SCRIPT_DIR/backend"
