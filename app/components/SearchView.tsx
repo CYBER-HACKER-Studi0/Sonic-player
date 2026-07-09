@@ -110,6 +110,7 @@ export default function SearchView() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search songs, artists, albums..."
+            dir="auto"
             className="w-full h-12 pl-12 pr-4 rounded-xl bg-sonic-surface3 border border-sonic-border text-sonic-textPrimary placeholder:text-sonic-textMuted/50 font-sans text-sm outline-none focus:border-[#e8c547]/30 focus:shadow-[0_0_20px_rgba(232,197,71,0.08)] transition-all duration-300"
           />
           {loading && (
