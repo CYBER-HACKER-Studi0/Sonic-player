@@ -67,26 +67,42 @@ export function clearAllPreloaded() {
 
 /**
  * Preload stream URLs for all visible search results.
- * Call this immediately after search results load!
+ * Uses batch endpoint — ONE request instead of 20!
  */
 export function preloadSearchResults(tracks: { id: string; videoId?: string; source?: string }[]) {
+  const videoIds = tracks
+    .filter(t => t.videoId && t.source === 'YouTube' && !preloadCache.has(t.id))
+    .map(t => t.videoId!)
+  
+  if (videoIds.length === 0) return
+
+  // Mark all as loading
   for (const track of tracks) {
-    if (!track.videoId || track.source !== 'YouTube') continue
-    if (preloadCache.has(track.id)) continue  // already preloaded or loading
-
-    preloadCache.set(track.id, '__loading__')
-
-    fetch(`${BACKEND}/stream/${track.videoId}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.audio_url) {
-          preloadCache.set(track.id, data.audio_url)
-        } else {
-          preloadCache.delete(track.id)
-        }
-      })
-      .catch(() => {
-        preloadCache.delete(track.id)
-      })
+    if (track.videoId && track.source === 'YouTube' && !preloadCache.has(track.id)) {
+      preloadCache.set(track.id, '__loading__')
+    }
   }
+
+  // Single batch request بدل N request
+  fetch(`${BACKEND}/batch_stream?ids=${videoIds.join(',')}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.urls) {
+        for (const [videoId, url] of Object.entries(data.urls)) {
+          if (url) {
+            // Find track by videoId
+            const track = tracks.find(t => t.videoId === videoId)
+            if (track) {
+              preloadCache.set(track.id, url as string)
+            }
+          }
+        }
+      }
+    })
+    .catch(() => {
+      // Cleanup loading markers on failure
+      for (const track of tracks) {
+        if (track.videoId) preloadCache.delete(track.id)
+      }
+    })
 }

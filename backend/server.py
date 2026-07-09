@@ -206,6 +206,14 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         if m:
             return self._handle_stream(m.group(1))
 
+        # ── Batch Stream URLs ──
+        if path == '/batch_stream':
+            ids_param = params.get('ids', '')
+            if ids_param:
+                ids = [i.strip() for i in ids_param.split(',') if i.strip()]
+                return self._handle_batch_stream(ids)
+            return self._send_json({'urls': {}})
+
         # ── Video Stream URL ──
         m = re.match(r'^/video_stream/([a-zA-Z0-9_-]+)$', path)
         if m:
@@ -432,6 +440,40 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
             cache['stream_url'][video_id] = {'data': data, 'time': time.time()}
         save_cache()
         return self._send_json(data)
+
+    def _handle_batch_stream(self, video_ids):
+        """Extract stream URLs for multiple videos in sequence (not parallel)."""
+        urls = {}
+        # Limit to first 5 to avoid blocking the server too long
+        for vid in video_ids[:5]:
+            if not vid:
+                continue
+            # Check cache first
+            with cache_lock:
+                if vid in cache.get('stream_url', {}):
+                    entry = cache['stream_url'][vid]
+                    if time.time() - entry.get('time', 0) < 7200:
+                        urls[vid] = entry['data'].get('audio_url', '')
+                        continue
+            # Extract
+            audio_url, _ = self._run_ytdlp([
+                '-g', '-f', 'bestaudio[ext=m4a]/bestaudio/best',
+                '--no-warnings', '--quiet',
+                f'https://www.youtube.com/watch?v={vid}'
+            ], timeout=30)
+            if not audio_url:
+                audio_url, _ = self._run_ytdlp([
+                    '-g', '--no-warnings', '--quiet',
+                    f'https://www.youtube.com/watch?v={vid}'
+                ], timeout=30)
+            if audio_url:
+                urls[vid] = audio_url
+                with cache_lock:
+                    if 'stream_url' not in cache:
+                        cache['stream_url'] = {}
+                    cache['stream_url'][vid] = {'data': {'audio_url': audio_url}, 'time': time.time()}
+                save_cache()
+        return self._send_json({'urls': urls})
 
     def _handle_video_stream(self, video_id):
         cache_key = f'video_{video_id}'
