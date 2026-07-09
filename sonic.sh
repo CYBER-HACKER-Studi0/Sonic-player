@@ -55,7 +55,7 @@ install_deps() {
     # PC: just install yt-dlp via pip
     if ! command -v yt-dlp &>/dev/null; then
       info "Installing yt-dlp..."
-      pip3 install yt-dlp 2>/dev/null || pip install yt-dlp 2>/dev/null || true
+      pip3 install yt-dlp 2>/dev/null || pip3 install --break-system-packages yt-dlp 2>/dev/null || pip install yt-dlp 2>/dev/null || pip install --break-system-packages yt-dlp 2>/dev/null || true
     fi
     command -v yt-dlp &>/dev/null && ok "yt-dlp $(yt-dlp --version 2>/dev/null)" || warn "yt-dlp not found — run: pip install yt-dlp"
   fi

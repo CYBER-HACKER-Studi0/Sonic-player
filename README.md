@@ -131,7 +131,8 @@ git clone https://github.com/CYBER-HACKER-Studi0/Sonic-player.git
 cd Sonic-player
 npm install
 npm run build
-pip install yt-dlp
+pip install yt-dlp --break-system-packages   # أوبونتو/ديبيان جديد
+# أو: pip install yt-dlp
 python3 backend/server.py &
 npx next start -p 3004
 ```
