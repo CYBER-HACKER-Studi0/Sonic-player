@@ -100,10 +100,21 @@ update_project() {
 # 3. Start the backend
 # ─────────────────────────────────────────────────────────
 start_backend() {
-  # Kill any old backend — طريقتين عشان نضمن
+  # Kill any old backend — طرق كتير عشان نضمن
   fuser -k 8005/tcp 2>/dev/null || true
   pkill -f "server.py" 2>/dev/null || true
+  pkill -f "python3.*8005" 2>/dev/null || true
+  # Last resort: use lsof
+  if command -v lsof &>/dev/null; then
+    lsof -ti:8005 | xargs kill -9 2>/dev/null || true
+  fi
   sleep 1
+  # Double-check port is free
+  if curl -s http://localhost:8005/health >/dev/null 2>&1; then
+    warn "Port 8005 still in use — killing by force..."
+    fuser -k -9 8005/tcp 2>/dev/null || true
+    sleep 1
+  fi
 
   info "Starting backend on port 8005..."
   cd "$SCRIPT_DIR/backend"
