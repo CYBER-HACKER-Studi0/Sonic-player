@@ -297,11 +297,14 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
                     sliced = entry['results'][offset:offset + limit]
                     return self._send_json({'results': sliced, 'total': len(entry['results']), 'cached': True})
 
+        # Larger limit = more timeout
+        search_timeout = min(30 + limit, 120)
+
         stdout, rc = self._run_ytdlp([
             '--quiet', '--no-warnings',
             '--dump-json', '--flat-playlist', '--ignore-errors',
             f'ytsearch{limit}:{q}'
-        ], timeout=30)
+        ], timeout=search_timeout)
 
         if rc == -1:
             return self._send_json({'results': [], 'total': 0, 'error': 'yt-dlp not found. Install: pkg install yt-dlp'})
