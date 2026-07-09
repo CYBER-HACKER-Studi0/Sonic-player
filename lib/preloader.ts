@@ -64,3 +64,29 @@ export function clearPreloaded(trackId: string) {
 export function clearAllPreloaded() {
   preloadCache.clear()
 }
+
+/**
+ * Preload stream URLs for all visible search results.
+ * Call this immediately after search results load!
+ */
+export function preloadSearchResults(tracks: { id: string; videoId?: string; source?: string }[]) {
+  for (const track of tracks) {
+    if (!track.videoId || track.source !== 'YouTube') continue
+    if (preloadCache.has(track.id)) continue  // already preloaded or loading
+
+    preloadCache.set(track.id, '__loading__')
+
+    fetch(`${BACKEND}/stream/${track.videoId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.audio_url) {
+          preloadCache.set(track.id, data.audio_url)
+        } else {
+          preloadCache.delete(track.id)
+        }
+      })
+      .catch(() => {
+        preloadCache.delete(track.id)
+      })
+  }
+}

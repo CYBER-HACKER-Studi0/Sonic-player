@@ -6,6 +6,7 @@ import { searchAll, searchYouTubePlaylists, getUploaderTracks } from '@/lib/api'
 import type { YouTubePlaylist } from '@/lib/api'
 import { toggleLike, isLiked, saveSearchQuery, getSearchCache, trackDownload, downloadToFolder, getPlaylists, addToPlaylist } from '@/lib/storage'
 import type { Playlist } from '@/lib/storage'
+import { preloadSearchResults } from '@/lib/preloader'
 import VideoModal from './VideoModal'
 
 export default function SearchView() {
@@ -45,6 +46,8 @@ export default function SearchView() {
         const res = await searchAll(q, 0, searchLimit)
         setResults(res)
         saveSearchQuery(q, res)
+        // Preload stream URLs for all visible results في الخلفية
+        preloadSearchResults(res)
       } catch { setResults([]) }
       setLoading(false)
     }
