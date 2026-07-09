@@ -243,6 +243,12 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         if m:
             return self._handle_download(m.group(1))
 
+        # ── Download Video ──
+        m = re.match(r'^/download_video/([a-zA-Z0-9_-]+)$', path)
+        if m:
+            quality = params.get('quality', 'best')
+            return self._handle_download_video(m.group(1), quality)
+
         # ── Download Local ──
         m = re.match(r'^/download_local/([a-zA-Z0-9_-]+)$', path)
         if m:
@@ -262,6 +268,15 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         # ── Local List ──
         if path == '/local_list':
             return self._handle_local_list()
+
+        # ── Country ──
+        if path == '/country':
+            return self._handle_country()
+
+        # ── Trending ──
+        if path == '/trending':
+            country = params.get('country', '')
+            return self._handle_trending(country)
 
         # ── Check Local ──
         if path == '/check_local':
@@ -567,8 +582,18 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
                 ['yt-dlp', '-f', 'bestaudio[ext=m4a]/bestaudio/best',
                  '-o', '-', '--no-warnings', '--quiet',
                  f'https://www.youtube.com/watch?v={video_id}'],
-                capture_output=True, timeout=60
+                capture_output=True, timeout=120
             )
+            if result.returncode != 0 or len(result.stdout) == 0:
+                # Fallback: download without format restriction
+                result = subprocess.run(
+                    ['yt-dlp', '-f', 'bestaudio', '-o', '-',
+                     '--no-warnings', '--quiet',
+                     f'https://www.youtube.com/watch?v={video_id}'],
+                    capture_output=True, timeout=120
+                )
+            if result.returncode != 0 or len(result.stdout) == 0:
+                return self._send_error(f'download failed (exit: {result.returncode})', 500)
             self.send_response(200)
             self.send_header('Content-Type', 'audio/mp4')
             self.send_header('Content-Disposition', f'attachment; filename="{video_id}.m4a"')
@@ -576,8 +601,39 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', str(len(result.stdout)))
             self.end_headers()
             self.wfile.write(result.stdout)
+        except subprocess.TimeoutExpired:
+            self._send_error('download timed out', 500)
         except Exception as e:
             self._send_error(f'download failed: {str(e)}', 500)
+
+    def _handle_download_video(self, video_id, quality):
+        """Download video at requested quality."""
+        quality_map = {
+            '1080p': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]',
+            '720p': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
+            '480p': 'bestvideo[height<=480]+bestaudio/best[height<=480]',
+            '360p': 'bestvideo[height<=360]+bestaudio/best[height<=360]',
+            'best': 'best[height<=720]',
+        }
+        fmt = quality_map.get(quality, quality_map['best'])
+        try:
+            result = subprocess.run(
+                ['yt-dlp', '-f', fmt, '-o', '-',
+                 '--no-warnings', '--quiet',
+                 f'https://www.youtube.com/watch?v={video_id}'],
+                capture_output=True, timeout=180
+            )
+            if result.returncode != 0 or len(result.stdout) == 0:
+                return self._send_error(f'video download failed (exit: {result.returncode})', 500)
+            self.send_response(200)
+            self.send_header('Content-Type', 'video/mp4')
+            self.send_header('Content-Disposition', f'attachment; filename="{video_id}.mp4"')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(result.stdout)))
+            self.end_headers()
+            self.wfile.write(result.stdout)
+        except Exception as e:
+            self._send_error(f'video download failed: {str(e)}', 500)
 
     def _handle_download_local(self, video_id, title):
         """Download audio to local storage."""
@@ -626,6 +682,42 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
                     'size': os.path.getsize(f)
                 })
         return self._send_json({'exists': False})
+
+    def _handle_country(self):
+        """Detect user's country via IP geolocation."""
+        try:
+            req = urllib.request.Request(
+                'http://ip-api.com/json/',
+                headers={'User-Agent': 'SonicPlayer/1.0'}
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+                return self._send_json({
+                    'country': data.get('country', ''),
+                    'countryCode': data.get('countryCode', ''),
+                    'city': data.get('city', ''),
+                })
+        except:
+            return self._send_json({'country': '', 'countryCode': '', 'city': ''})
+
+    def _handle_trending(self, country):
+        """Get trending songs based on country."""
+        try:
+            # Use yt-dlp to search for trending music in the user's region
+            search_query = 'trending music'
+            if country:
+                search_query = f'trending music in {country}'
+
+            stdout, rc = self._run_ytdlp([
+                '--quiet', '--no-warnings',
+                '--dump-json', '--flat-playlist', '--ignore-errors',
+                f'ytsearch30:{search_query}'
+            ], timeout=30)
+
+            tracks = self._parse_yt_search(stdout)
+            return self._send_json({'tracks': tracks, 'country': country or 'global'})
+        except:
+            return self._send_json({'tracks': [], 'country': country or 'global'})
 
     # ── HTTP method handlers ──
 
