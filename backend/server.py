@@ -17,6 +17,7 @@ import urllib.parse
 import urllib.request
 import threading
 import glob
+import socketserver
 from pathlib import Path
 
 PORT = 8005
@@ -636,9 +637,10 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
 
 
 def run_server():
-    server = http.server.HTTPServer(('0.0.0.0', PORT), SonicHandler)
+    server = socketserver.ThreadingTCPServer(('0.0.0.0', PORT), SonicHandler)
+    server.allow_reuse_address = True
     print(f'[Sonic] Backend running on http://localhost:{PORT}')
-    print(f'[Sonic] Zero dependencies — stdlib only!')
+    print(f'[Sonic] Multi-threaded — zero dependencies!')
     try:
         server.serve_forever()
     except KeyboardInterrupt:
