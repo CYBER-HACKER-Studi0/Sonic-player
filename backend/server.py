@@ -289,7 +289,7 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
     # ── Handler Implementations ──
 
     def _handle_search(self, q, limit, offset):
-        cache_key = f'search_{q}'
+        cache_key = f'search_{q}_{limit}'
         with cache_lock:
             if cache_key in cache.get('search', {}):
                 entry = cache['search'][cache_key]
