@@ -144,8 +144,8 @@ fi
 # ── 6. Build ──
 step "6/7  Building Frontend"
 
-echo -e "  ${CYAN}→${NC} Running next build..."
-npx next build 2>&1
+echo -e "  ${CYAN}→${NC} Running npm build (using local Next.js)..."
+npm run build 2>&1
 echo ""
 if [ -d ".next" ]; then
   ok "Build complete ✓"

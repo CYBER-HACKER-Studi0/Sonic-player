@@ -8,9 +8,7 @@ set +e  # Don't exit on error - we handle them
 
 # ── Kill any existing processes on our ports ──
 # Termux-friendly: works everywhere
-pkill -f "python3 server.py" 2>/dev/null
-pkill -f "next dev" 2>/dev/null
-pkill -f "next start" 2>/dev/null
+pkill -f "python" 2>/dev/null
 sleep 1
 
 RED='\033[0;31m'
@@ -130,6 +128,6 @@ cleanup() {
   echo -e "  ${GREEN}✓${NC} Stopped."
   exit 0
 }
-trap cleanup SIGINT SIGTERM
+trap cleanup INT TERM
 
 wait
