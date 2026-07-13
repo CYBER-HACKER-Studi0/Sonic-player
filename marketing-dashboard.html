@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBER-HACKER-Studio - Marketing Crew</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07080b;color:#e0e0e0;min-height:100vh}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0a0c12}
+::-webkit-scrollbar-thumb{background:#1a1d2e;border-radius:3px}
+
+/* Header */
+.header{background:linear-gradient(135deg,#0a0c12,#12141f);border-bottom:1px solid #1a1d2e;padding:16px 30px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:20px;color:#fff;display:flex;align-items:center;gap:10px}
+.header h1 span{color:#6366f1}
+.badge{background:#6366f1;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px}
+
+/* Layout */
+.container{display:flex;height:calc(100vh - 70px)}
+.sidebar{width:280px;background:#0a0c12;border-left:1px solid #1a1d2e;overflow-y:auto;padding:16px}
+.sidebar h3{font-size:12px;color:#6366f1;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;padding:0 12px}
+.main{flex:1;overflow-y:auto;padding:24px}
+
+/* Agent List */
+.agent-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all .2s;font-size:13px;color:#888;border:1px solid transparent}
+.agent-item:hover{background:#12141f;color:#fff}
+.agent-item.active{background:#1a1d2e;border-color:#6366f1;color:#fff}
+.agent-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.agent-role{flex:1}
+.agent-status{width:8px;height:8px;border-radius:50%;background:#1a1d2e}
+.agent-status.active{background:#22c55e;box-shadow:0 0 8px #22c55e44}
+.agent-status.busy{background:#f59e0b;box-shadow:0 0 8px #f59e0b44}
+
+/* Cards */
+.card{background:#0d0f17;border:1px solid #1a1d2e;border-radius:12px;padding:20px;margin-bottom:16px}
+.card h2{font-size:16px;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* Form */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:#888;margin-bottom:6px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;background#0a0c12;border:1px solid #1a1d2e;border-radius:8px;color:#fff;font-size:14px;transition:all .2s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 3px #6366f122}
+.form-group textarea{min-height:100px;resize:vertical}
+
+/* Buttons */
+.btn{padding:10px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;transition:all .2s;font-weight:500}
+.btn-primary{background:#6366f1;color:#fff}
+.btn-primary:hover{background:#5558e6;box-shadow:0 4px 15px #6366f144}
+.btn-secondary{background:#1a1d2e;color:#fff}
+.btn-secondary:hover{background:#242738}
+.btn-success{background:#22c55e;color:#fff}
+.btn-danger{background:#ef4444;color:#fff}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-group{display:flex;gap:8px;margin-top:16px}
+
+/* Grid */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* Steps */
+.steps{display:flex;gap:8px;margin-bottom:24px;overflow-x:auto;padding:4px}
+.step{padding:8px 16px;border-radius:8px;background:#0d0f17;border:1px solid #1a1d2e;font-size:12px;color:#666;white-space:nowrap;min-width:120px;text-align:center}
+.step.active{background:#1a1d2e;border-color:#6366f1;color:#6366f1}
+.step.done{background:#12141f;border-color:#22c55e;color:#22c55e}
+
+/* Chat / Timeline */
+.timeline{position:relative;padding-right:20px}
+.timeline-item{position:relative;padding:12px 16px;margin-bottom:8px;border-right:2px solid #1a1d2e;margin-right:12px}
+.timeline-item::before{content:'';position:absolute;right:-6px;top:16px;width:10px;height:10px;border-radius:50%;background:#1a1d2e}
+.timeline-item.done::before{background:#22c55e}
+.timeline-item.active::before{background:#6366f1;box-shadow:0 0 10px #6366f144}
+.timeline-time{font-size:11px;color:#666;margin-bottom:4px}
+.timeline-text{font-size:13px;color:#ccc}
+
+/* File upload */
+.upload-zone{border:2px dashed #1a1d2e;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px}
+.upload-zone:hover{border-color:#6366f1;background#0d0f17}
+.upload-zone.has-file{border-color:#22c55e}
+.upload-zone .icon{font-size:40px;margin-bottom:8px}
+.upload-zone p{color:#888;font-size:14px}
+.upload-zone .file-name{color:#22c55e;font-size:13px;margin-top:8px}
+
+/* Results */
+.result-card{background:linear-gradient(135deg,#0d0f17,#12141f);border:1px solid #1a1d2e;border-radius:12px;padding:16px;margin-bottom:12px}
+.result-card h3{font-size:14px;color:#6366f1;margin-bottom:8px}
+.result-card p{font-size:13px;color:#aaa;line-height:1.6}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:#0d0f17;border:1px solid #1a1d2e;border-radius:10px;padding:16px;text-align:center}
+.stat-value{font-size:28px;font-weight:700;color:#fff;margin-bottom:4px}
+.stat-label{font-size:12px;color:#666}
+
+/* Modal */
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-content{background#0d0f17;border:1px solid #1a1d2e;border-radius:16px;padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto}
+
+/* Responsive */
+@media(max-width:768px){.container{flex-direction:column}.sidebar{width:100%;height:auto;border-bottom:1px solid #1a1d2e}.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🤖 <span>Marketing</span> Crew <span class="badge">25 Agents</span></h1>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span style="font-size:12px;color:#666">CYBER-HACKER-Studio</span>
+    <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar" id="agentList"></div>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Steps -->
+    <div class="steps" id="stepsBar"></div>
+
+    <!-- Stats -->
+    <div class="stats" id="statsBar"></div>
+
+    <!-- Project Setup -->
+    <div class="card" id="setupCard">
+      <h2>🎯 إعداد المشروع</h2>
+      <div class="form-group">
+        <label>اسم المشروع / الشركة</label>
+        <input type="text" id="projectName" value="CYBER-HACKER-Studio" placeholder="اسم شركتك">
+      </div>
+      <div class="form-group">
+        <label>الهدف التسويقي</label>
+        <textarea id="projectGoal" placeholder="مثال: أريد زيادة مبيعات تطبيقات الأندرويد وبناء علامة تجارية قوية في مجال الأمن السيبراني">تسويق تطبيقات الشركة وبناء حضور قوي في سوق الأدوات الأمنية والتطبيقات</textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>الجمهور المستهدف</label>
+          <input type="text" id="targetAudience" value="مطورون، شركات ناشئة، مهتمون بالأمن السيبراني" placeholder="جمهورك">
+        </div>
+        <div class="form-group">
+          <label>الميزانية (اختياري)</label>
+          <input type="text" id="budget" placeholder="$">
+        </div>
+      </div>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="icon">📎</div>
+        <p>اسحب ملفاتك هنا أو اضغط للرفع</p>
+        <p style="font-size:12px;color:#555">PDF, صور, فيديو, مستندات</p>
+        <div class="file-name" id="fileName"></div>
+        <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this)">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="startCampaign()">🚀 بدء الحملة التسويقية</button>
+        <button class="btn btn-secondary">💾 حفظ المسودة</button>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="card" id="progressCard" style="display:none">
+      <h2>⏳ سير العمل</h2>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <!-- Results -->
+    <div class="card" id="resultsCard" style="display:none">
+      <h2>📊 نتائج التحليل</h2>
+      <div id="results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Agent Modal -->
+<div class="modal" id="agentModal">
+  <div class="modal-content">
+    <h2 id="modalTitle" style="margin-bottom:12px"></h2>
+    <p id="modalDesc" style="color:#888;font-size:14px;margin-bottom:16px"></p>
+    <div id="modalTasks" style="margin-bottom:16px"></div>
+    <button class="btn btn-secondary" onclick="closeModal()">إغلاق</button>
+  </div>
+</div>
+
+<script>
+const agents = [
+  {icon:'🧠',role:'Marketing Strategist',goal:'تطوير استراتيجية تسويقية شاملة',status:'idle',color:'#6366f1'},
+  {icon:'📝',role:'Content Manager',goal:'إدارة وتنسيق المحتوى التسويقي',status:'idle',color:'#22c55e'},
+  {icon:'✍️',role:'Content Writer - Arabic',goal:'كتابة محتوى تسويقي بالعربية',status:'idle',color:'#f59e0b'},
+  {icon:'✍️',role:'Content Writer - English',goal:'Write English marketing content',status:'idle',color:'#6366f1'},
+  {icon:'🎨',role:'Graphic Design Strategist',goal:'توجيه التصميمات البصرية',status:'idle',color:'#ec4899'},
+  {icon:'📱',role:'Social Media Manager',goal:'إدارة حسابات التواصل الاجتماعي',status:'idle',color:'#22c55e'},
+  {icon:'🔍',role:'SEO Specialist',goal:'تحسين محركات البحث',status:'idle',color:'#f59e0b'},
+  {icon:'💰',role:'Paid Ads Manager',goal:'إدارة الحملات الإعلانية المدفوعة',status:'idle',color:'#ef4444'},
+  {icon:'📊',role:'Marketing Data Analyst',goal:'تحليل بيانات الحملات',status:'idle',color:'#6366f1'},
+  {icon:'🏢',role:'Brand Manager',goal:'بناء الهوية التجارية',status:'idle',color:'#22c55e'},
+  {icon:'🤝',role:'Influencer Marketing',goal:'التواصل مع المؤثرين',status:'idle',color:'#ec4899'},
+  {icon:'🎬',role:'Video Marketing Manager',goal:'إنتاج محتوى فيديو',status:'idle',color:'#ef4444'},
+  {icon:'📧',role:'Email Marketing Specialist',goal:'بناء حملات البريد الإلكتروني',status:'idle',color:'#f59e0b'},
+  {icon:'🔎',role:'Competitor Analyst',goal:'تحليل المنافسين',status:'idle',color:'#6366f1'},
+  {icon:'👥',role:'Community Manager',goal:'بناء المجتمع',status:'idle',color:'#22c55e'},
+  {icon:'📦',role:'Product Marketing Manager',goal:'تسويق المنتجات',status:'idle',color:'#f59e0b'},
+  {icon:'📝',role:'Video Script Writer',goal:'كتابة سيناريوهات',status:'idle',color:'#ec4899'},
+  {icon:'📰',role:'PR Specialist',goal:'العلاقات العامة',status:'idle',color:'#6366f1'},
+  {icon:'📱',role:'ASO Specialist',goal:'تحسين متاجر التطبيقات',status:'idle',color:'#22c55e'},
+  {icon:'📈',role:'CRO Specialist',goal:'تحسين معدلات التحويل',status:'idle',color:'#f59e0b'},
+  {icon:'📉',role:'Market Trend Analyst',goal:'تحليل توجهات السوق',status:'idle',color:'#6366f1'},
+  {icon:'▶️',role:'YouTube Marketing',goal:'إدارة قنوات اليوتيوب',status:'idle',color:'#ef4444'},
+  {icon:'🎵',role:'TikTok Marketing',goal:'إنشاء محتوى تيك توك',status:'idle',color:'#22c55e'},
+  {icon:'📋',role:'Project Manager',goal:'إدارة المشروع',status:'idle',color:'#f59e0b'},
+  {icon:'👑',role:'CMO',goal:'القيادة التسويقية',status:'idle',color:'#6366f1'}
+];
+
+const steps = [
+  '🎯 تحليل السوق','📊 تحليل المنافسين','📝 خطة المحتوى','🏢 الهوية التجارية','📱 استراتيجية التواصل','👑 التقرير النهائي'
+];
+
+let campaignRunning = false;
+
+// Render Agent List
+function renderAgents(){
+  const el = document.getElementById('agentList');
+  el.innerHTML = '<h3>فريق التسويق</h3>' + agents.map((a,i) => `
+    <div class="agent-item" onclick="showAgent(${i})">
+      <div class="agent-icon" style="background:${a.color}22;color:${a.color}">${a.icon}</div>
+      <div class="agent-role">${a.role}</div>
+      <div class="agent-status ${a.status === 'active' ? 'busy' : a.status === 'done' ? 'active' : ''}"></div>
+    </div>
+  `).join('');
+}
+
+// Render Steps
+function renderSteps(){
+  const el = document.getElementById('stepsBar');
+  el.innerHTML = steps.map((s,i) => `<div class="step ${i===0?'active':''}">${s}</div>`).join('');
+}
+
+// Render Stats
+function renderStats(){
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><div class="stat-value">${agents.length}</div><div class="stat-label">الوكلاء</div></div>
+    <div class="stat"><div class="stat-value">${steps.length}</div><div class="stat-label">المهام</div></div>
+    <div class="stat"><div class="stat-value">${agents.filter(a=>a.status==='done').length}</div><div class="stat-label">مكتمل</div></div>
+    <div class="stat"><div class="stat-value">${campaignRunning ? '🟢' : '⏸️'}</div><div class="stat-label">الحالة</div></div>
+  `;
+}
+
+// Show Agent
+function showAgent(i){
+  const a = agents[i];
+  document.getElementById('modalTitle').textContent = `${a.icon} ${a.role}`;
+  document.getElementById('modalDesc').textContent = a.goal;
+  document.getElementById('modalTasks').innerHTML = `<div class="result-card"><p style="color:#888">التخصص: ${a.goal}<br>الحالة: ${a.status === 'idle' ? '⏳ في الانتظار' : a.status === 'active' ? '🔄 يعمل' : '✅ اكتمل'}</p></div>`;
+  document.getElementById('agentModal').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('agentModal').classList.remove('show');
+}
+
+// Handle File Upload
+function handleFiles(input){
+  const files = input.files;
+  if(files.length > 0){
+    document.getElementById('fileName').textContent = `📎 ${files.length} ملف: ${Array.from(files).map(f=>f.name).join(', ')}`;
+    document.getElementById('uploadZone').classList.add('has-file');
+  }
+}
+
+// Start Campaign
+function startCampaign(){
+  if(campaignRunning) return;
+  campaignRunning = true;
+  
+  document.getElementById('setupCard').style.display = 'none';
+  document.getElementById('progressCard').style.display = 'block';
+  document.getElementById('resultsCard').style.display = 'block';
+  
+  addTimelineItem('🚀 بدء الحملة التسويقية', 'جاري تجهيز الفريق...', 'active');
+  renderStats();
+  
+  // Simulate campaign progress
+  const tasks = [
+    {name:'تحليل السوق',agent:'Market Trend Analyst',time:2000},
+    {name:'تحليل المنافسين',agent:'Competitor Analyst',time:2500},
+    {name:'تحليل الجمهور',agent:'Marketing Data Analyst',time:2000},
+    {name:'بناء استراتيجية المحتوى',agent:'Content Manager',time:3000},
+    {name:'كتابة المحتوى العربي',agent:'Content Writer - Arabic',time:3500},
+    {name:'كتابة المحتوى الإنجليزي',agent:'Content Writer - English',time:3000},
+    {name:'تحسين SEO',agent:'SEO Specialist',time:2000},
+    {name:'استراتيجية العلامة التجارية',agent:'Brand Manager',time:2500},
+    {name:'التواصل مع المؤثرين',agent:'Influencer Marketing',time:2000},
+    {name:'إدارة المجتمع',agent:'Community Manager',time:2000},
+    {name:'خطة اليوتيوب',agent:'YouTube Marketing',time:2500},
+    {name:'خطة تيك توك',agent:'TikTok Marketing',time:2000},
+    {name:'تحليل متاجر التطبيقات',agent:'ASO Specialist',time:2000},
+    {name:'تحسين التحويل',agent:'CRO Specialist',time:2000},
+    {name:'تحليل الحملات الإعلانية',agent:'Paid Ads Manager',time:2500},
+    {name:'كتابة السيناريو',agent:'Video Script Writer',time:2500},
+    {name:'تقرير العلاقات العامة',agent:'PR Specialist',time:2000},
+    {name:'خطة البريد الإلكتروني',agent:'Email Marketing Specialist',time:2000},
+    {name:'استراتيجية الفيديو',agent:'Video Marketing Manager',time:2500},
+    {name:'إدارة المنتجات',agent:'Product Marketing Manager',time:2000},
+    {name:'تنسيق المشروع',agent:'Project Manager',time:2000},
+    {name:'التقرير التسويقي النهائي',agent:'CMO',time:3000}
+  ];
+  
+  let totalTime = 0;
+  tasks.forEach((t,i) => {
+    totalTime += t.time;
+    setTimeout(() => {
+      const agent = agents.find(a => a.role === t.agent);
+      if(agent) agent.status = 'done';
+      addTimelineItem(t.name, `بواسطة: ${t.agent}`, 'done');
+      updateSteps(i);
+      renderStats();
+      renderAgents();
+      
+      if(i === tasks.length - 1){
+        addTimelineItem('✅ الحملة التسويقية اكتملت!', 'جميع المهام تمت بنجاح', 'active');
+        showResults();
+      }
+    }, totalTime);
+  });
+}
+
+function updateSteps(stepIndex){
+  const s = Math.floor(stepIndex / 4);
+  document.querySelectorAll('.step').forEach((el,i) => {
+    el.className = 'step' + (i < s ? ' done' : i === s ? ' active' : '');
+  });
+}
+
+function addTimelineItem(title, desc, status){
+  const el = document.getElementById('timeline');
+  const item = document.createElement('div');
+  item.className = 'timeline-item ' + status;
+  item.innerHTML = `<div class="timeline-time">${new Date().toLocaleTimeString('ar-EG')}</div>
+                    <div class="timeline-text"><strong>${title}</strong><br>${desc}</div>`;
+  el.appendChild(item);
+  el.scrollTop = el.scrollHeight;
+}
+
+function showResults(){
+  document.getElementById('results').innerHTML = `
+    <div class="result-card">
+      <h3>📊 التقرير النهائي</h3>
+      <p>اكتملت الحملة التسويقية لـ <strong>CYBER-HACKER-Studio</strong> بنجاح!</p>
+    </div>
+    <div class="grid-2">
+      <div class="result-card">
+        <h3>🎯 تحليل السوق</h3>
+        <p>تم تحليل سوق تطبيقات الأندرويد وأدوات الأمن السيبراني، وتحديد الفرص المتاحة في السوق المصري والعربي.</p>
+      </div>
+      <div class="result-card">
+        <h3>📝 خطة المحتوى</h3>
+        <p>تم تطوير خطة محتوى شاملة بالعربية والإنجليزية لمنتجات الشركة (CyberHound, Sonic Player, Mizan).</p>
+      </div>
+      <div class="result-card">
+        <h3>🏢 الهوية التجارية</h3>
+        <p>تم بناء دليل الهوية التجارية لـ CYBER-HACKER-Studio يشمل الشعار والألوان ونبرة الصوت.</p>
+      </div>
+      <div class="result-card">
+        <h3>📱 استراتيجية التواصل</h3>
+        <p>خطة متكاملة لوسائل التواصل الاجتماعي تشمل YouTube, TikTok, Instagram, Telegram, Facebook.</p>
+      </div>
+    </div>
+  `;
+}
+
+// Init
+renderAgents();
+renderSteps();
+renderStats();
+</script>
+</body>
+</html>
