@@ -198,9 +198,13 @@ step "3/5  Installing Frontend (npm) Packages"
 
 info "Installing Next.js, React, and dependencies..."
 echo ""
-if [ -d "node_modules" ]; then
-  ok "node_modules already exists — skipping npm install"
+if [ -d "node_modules" ] && [ -f "node_modules/next/package.json" ]; then
+  ok "node_modules with Next.js found — skipping npm install"
 else
+  if [ -d "node_modules" ]; then
+    warn "node_modules موجود بس packages ناقصة — هانصب من الأول..."
+    rm -rf node_modules .next
+  fi
   npm install 2>&1
   echo ""
   if [ -d "node_modules/.bin/next" ] || [ -f "node_modules/.bin/next" ]; then
@@ -220,10 +224,11 @@ ok "Downloads folder ready: backend/downloads/"
 step "5/5  Building Frontend"
 
 if [ -d ".next" ]; then
-  info "Existing build found — rebuilding..."
+  info "Removing old build cache..."
+  rm -rf .next
 fi
 
-info "Building Sonic Player..."
+info "Building Sonic Player ..."
 echo ""
 npx next build 2>&1
 echo ""
