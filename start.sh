@@ -29,7 +29,7 @@ echo -e "  ${YELLOW}   المستخدم وحده يتحمل المسؤولية.$
 echo ""
 
 # ── Check if install needed ──
-if [ ! -d "node_modules" ] || [ ! -f "backend/requirements.txt" ]; then
+if [ ! -d "node_modules" ] || [ ! -f ".next/BUILD_ID" ]; then
   echo -e "  ${YELLOW}⚠ Dependencies not found. Running install first...${NC}"
   bash install.sh
   echo ""
