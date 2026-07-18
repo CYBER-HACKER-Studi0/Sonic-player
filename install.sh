@@ -97,7 +97,7 @@ if [ "$OS" = "termux" ]; then
       ok "$dep already installed"
     else
       info "Installing $dep..."
-      $PKG_INSTALL "$dep" 2>&1 | tail -1 >/dev/null
+      $PKG_INSTALL "$dep" 2>&1
       ok "$dep installed"
     fi
   done
@@ -131,7 +131,7 @@ if [ "$OS" = "termux" ]; then
   # Install pip if missing
   if ! $PYTHON -m pip --version &>/dev/null; then
     info "Installing python-pip..."
-    pkg install -y python-pip 2>&1 | tail -1 >/dev/null
+    pkg install -y python-pip 2>&1
   fi
 else
   PYTHON=python3
@@ -148,17 +148,17 @@ fi
 if [ "$OS" = "termux" ]; then
   # Termux: install yt-dlp via pkg (no Rust needed!)
   info "Installing yt-dlp via pkg..."
-  pkg install -y yt-dlp 2>&1 | tail -1 >/dev/null
+  pkg install -y yt-dlp 2>&1
   if command -v yt-dlp &>/dev/null; then
     ok "yt-dlp installed via pkg"
   else
     warn "yt-dlp install via pkg failed, trying pip..."
-    $PYTHON -m pip install yt-dlp 2>&1 | tail -3
+    $PYTHON -m pip install yt-dlp 2>&1
   fi
 else
   # Linux/macOS: only need yt-dlp (stdlib handles everything else)
   info "Installing yt-dlp..."
-  $PIP install yt-dlp 2>&1 || $PIP install --break-system-packages yt-dlp 2>&1 | tail -3
+  $PIP install yt-dlp 2>&1 || $PIP install --break-system-packages yt-dlp 2>&1
 fi
 
 if command -v yt-dlp &>/dev/null || $PYTHON -c "import yt_dlp" 2>/dev/null; then

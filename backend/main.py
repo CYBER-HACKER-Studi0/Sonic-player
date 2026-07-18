@@ -1,4 +1,17 @@
+# ═══════════════════════════════════════════════════════════════════
+# ⚠️  DEPRECATED — هذا الملف قديم ولا يُنصح باستخدامه
+#
+#  استخدم server.py بدلاً من main.py:
+#    • zero dependencies خارجية (لا يحتاج FastAPI, uvicorn, requests...)
+#    • توافق أفضل مع Termux وبيئات ARM64
+#    • نفس الوظائف بالضبط — بل وأسرع وأخف
+#
+#  $ cd backend && python3 server.py
+# ═══════════════════════════════════════════════════════════════════
 # Sonic Backend v3 - Fast with yt-dlp -g + caching
+# ⚠️  DEPRECATED — Use server.py instead (lighter, zero deps, Termux-friendly)
+# ═══════════════════════════════════════════════════════════════════
+
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -404,4 +417,6 @@ async def health():
     return {"status": "ok", "cached_streams": len(cache['stream_url'])}
 
 if __name__ == "__main__":
+    import sys
+    print("⚠️ DEPRECATED: استخدم server.py بدلاً من main.py (zero dependencies, أفضل توافق مع Termux)", file=sys.stderr)
     uvicorn.run(app, host="0.0.0.0", port=8005)

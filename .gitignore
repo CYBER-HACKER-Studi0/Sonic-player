@@ -24,6 +24,8 @@ Thumbs.db
 # Cache
 *.log
 backend/__pycache__/
+backend/sonic_cache.json
+tsconfig.tsbuildinfo
 
 # Keep downloads dir but not files
 backend/downloads/*.m4a

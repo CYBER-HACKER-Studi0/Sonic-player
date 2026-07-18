@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { usePlayerStore } from '@/lib/player-store'
-import { getDemoTracks, getRecommendations } from '@/lib/api'
+import { getDemoTracks, getRecommendations, searchYouTube } from '@/lib/api'
 import { getRecentTracks, getTopTracks, getListeningGenres } from '@/lib/storage'
 import type { TrackResult } from '@/lib/api'
+
+const BACKEND = 'http://localhost:8005'
 
 export default function HomeView() {
   const setQueue = usePlayerStore((s) => s.setQueue)
@@ -16,6 +18,11 @@ export default function HomeView() {
   const [recommendations, setRecommendations] = useState<TrackResult[]>([])
   const [recommendLabel, setRecommendLabel] = useState('Recommended for You')
   const [hasHistory, setHasHistory] = useState(false)
+  
+  // Country + Trending
+  const [country, setCountry] = useState('')
+  const [trending, setTrending] = useState<TrackResult[]>([])
+  const [trendingLoading, setTrendingLoading] = useState(false)
 
   // Fallback state
   const [tracks, setTracks] = useState<TrackResult[]>([])

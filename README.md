@@ -8,7 +8,7 @@
   <!-- Badges -->
   <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js">
   <img src="https://img.shields.io/badge/TypeScript-6-blue?style=flat-square&logo=typescript">
-  <img src="https://img.shields.io/badge/FastAPI-Python-green?style=flat-square&logo=fastapi">
+  <img src="https://img.shields.io/badge/Python-3-3776AB?style=flat-square&logo=python">
   <img src="https://img.shields.io/badge/License-MIT-gold?style=flat-square">
   <br><br>
   <!-- Social Links — SVG Icons -->
@@ -29,7 +29,7 @@
     <svg width="32" height="32" viewBox="0 0 24 24" fill="#808080" style="margin:0 6px;transition:fill 0.2s" onmouseover="this.fill='#ffffff'" onmouseout="this.fill='#808080'"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
   </a>
   <a href="https://github.com/CYBER-HACKER-Studi0" target="_blank">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="#808080" style="margin:0 6px;transition:fill 0.2s" onmouseover="this.fill='#ffffff'" onmouseout="this.fill='#808080'"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="#808080" style="margin:0 6px;transition:fill 0.2s" onmouseover="this.fill='#ffffff'" onmouseout="this.fill='#808080'"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12\"/></svg>
   </a>
   <br><br>
 
@@ -63,7 +63,7 @@
     <sub>▶️ Click to watch — 40-second promo · 1920×1080</sub>
   </a>
   <br><br>
-  <p><b>SONIC PLAYER</b> — Modern music streaming app built with Next.js & FastAPI</p>
+  <p><b>SONIC PLAYER</b> — Modern music streaming app built with Next.js & Python</p>
   <p>🔍 Search millions of YouTube tracks · 🧠 AI smart recommendations · 📥 Offline downloads</p>
   <p>🎨 7 real-time visualizers · 📋 Playlists with album art · 📜 Synced lyrics</p>
   <p>⚡ Seamless playback with pre-buffering · 📱 Runs on Termux (Android)</p>
@@ -88,17 +88,39 @@
 
 ## ✨ Features
 
+### 🎵 Core Music
 | Feature | Description |
 |---------|-------------|
-| 🔍 **YouTube Search** | Search millions of tracks. Choose 20–200 results |
-| 🧠 **Smart Recommendations** | AI-powered suggestions based on listening history |
-| 🎬 **YouTube Playlists** | Browse channels as playlists |
-| 📥 **Offline Downloads** | Save tracks & play them without internet |
-| 🎨 **7 Visualizers** | Bars, Wave, Circle, Fire, Aurora, Plasma, Rings |
-| 📋 **Playlists** | Create & manage with album art thumbnails |
-| 📜 **Synced Lyrics** | Auto-scrolling LRC support |
-| ⚡ **Preloader** | Next track buffers while current plays — instant switching |
-| 📱 **Termux Support** | Runs on Android via Termux |
+| 🔍 **YouTube Search** | Search millions of tracks. Choose 20–200 results per query |
+| 🧠 **Smart Recommendations** | AI-powered suggestions based on your listening history |
+| 🎬 **YouTube Playlists** | Browse channels as auto-generated playlists |
+| 📥 **Offline Downloads** | Save tracks and play them without internet connection |
+| 📜 **Synced Lyrics** | Auto-scrolling LRC support via LRCLib API |
+
+### 🎨 Visual & UI
+| Feature | Description |
+|---------|-------------|
+| 🎨 **7 Real-Time Visualizers** | Bars, Wave, Circle, Fire, Aurora, Plasma, Rings |
+| 📋 **Playlist Management** | Create & manage playlists with album art thumbnails |
+| ⚡ **Smart Preloader** | Next track buffers while current plays — instant switching |
+
+### 📱 Platform Support
+| Feature | Description |
+|---------|-------------|
+| 💻 **PC / Linux** | Full desktop experience via Next.js + Python backend |
+| 📱 **Termux (Android)** | Runs natively on Android via Termux environment |
+| 🚀 **One-Command Setup** | `bash sonic.sh` — installs everything automatically |
+
+---
+
+## 🗂️ Table of Contents
+
+- [🚀 Quick Start](#-quick-start)
+- [🏗️ Project Structure](#-project-structure)
+- [📄 License](#-license)
+- [🛡️ Privacy Policy](#-privacy-policy)
+- [⚠️ Disclaimer](#-disclaimer)
+- [🏢 About CYBER·HACKER·Studio](#-about-cyber-hacker-studio)
 
 ---
 
@@ -110,7 +132,7 @@
 bash sonic.sh
 ```
 
-ده بيعمل كل حاجة: تحديث المشروع ← تثبيت dependencies ← تشغيل backend + frontend.
+> ده بيعمل كل حاجة: تحديث المشروع ← تثبيت dependencies ← تشغيل backend + frontend.
 
 أو استخدم أوامر منفصلة:
 
@@ -120,7 +142,7 @@ bash sonic.sh update    # تحديث المشروع + تثبيت dependencies
 bash sonic.sh start     # تشغيل كل حاجة
 ```
 
-### Manual (PC/Linux)
+### 🖥️ Manual (PC/Linux)
 
 ```bash
 git clone https://github.com/CYBER-HACKER-Studi0/Sonic-player.git
@@ -144,7 +166,7 @@ After setup completes, start with:
 sh start.sh
 ```
 
-> **Note:** The new backend (server.py) uses Python stdlib only — no pydantic, fastapi, syncedlyrics, or Rust required! 🎉
+> **Note about backends:** The recommended backend is `server.py` — it uses Python stdlib only (zero dependencies, no pip packages needed except yt-dlp). The old `main.py` (FastAPI version) is **deprecated and no longer used**. `server.py` is ideal for Termux and resource-constrained environments. 🎉
 
 Open **http://localhost:3004** in your browser.
 
@@ -154,10 +176,15 @@ Open **http://localhost:3004** in your browser.
 
 ```
 sonic-player/
-├── app/components/      # React components (16 files)
-├── backend/              # FastAPI server + downloads
+├── app/components/       # React components (16 files)
+├── backend/
+│   ├── server.py         # ✅ Recommended backend — zero deps (stdlib only)
+│   ├── main.py           # ❌ Deprecated — FastAPI version (no longer used)
+│   └── downloads/        # Offline downloaded files
 ├── lib/                  # State, API, storage, preloader
 ├── promo/                # Screenshots for README
+├── PRIVACY.md            # Privacy policy
+├── LICENSE               # MIT License
 ├── demo.html             # Live demo page
 ├── install.sh            # Termux/Linux installer
 ├── start.sh              # Quick launcher
@@ -166,23 +193,64 @@ sonic-player/
 
 ---
 
-## 🏢 About CYBER · HACKER · Studio
+## 📄 License
 
-**CYBER · HACKER · Studio** is an indie development studio focused on building 
-modern applications and open-source tools. We specialize in:
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
-- 📱 **Android App Development** — Native Kotlin/Jetpack Compose
-- 🎵 **Media Applications** — Music streaming, video processing
-- 🛠️ **Developer Tools** — CLI utilities, productivity apps
-- 🌐 **Open Source** — Free tools for the community
+Copyright (c) 2026 CYBER·HACKER·Studio
 
-Our mission is to build high-quality, practical software that pushes boundaries.
+---
+
+## 🛡️ Privacy Policy
+
+Sonic Player takes your privacy seriously. Here's a quick overview:
+
+- **ip-api.com**: Used to determine your country via a simple IP lookup. No data is stored.
+- **LRCLib API**: When you search for lyrics, the song title and artist are sent to LRCLib. Nothing is saved.
+- **No tracking**: No analytics, no telemetry, no data collection.
+- **No accounts**: Everything is stored locally in your browser.
+
+For full details, see the **[Privacy Policy](PRIVACY.md)**.
 
 ---
 
 ## ⚠️ Disclaimer
 
-This project uses **yt-dlp** for educational purposes only. Users are responsible for complying with YouTube's Terms of Service. yt-dlp is optional — the app also supports Jamendo (licensed) and local file playback.
+**Please read this carefully before using Sonic Player.**
+
+This project integrates **yt-dlp** (a command-line tool for downloading media from YouTube and other sites) for **educational purposes only**. By using Sonic Player, you acknowledge and agree to the following:
+
+1. **YouTube Terms of Service** — Using yt-dlp to access YouTube content may violate YouTube's Terms of Service. This project does not encourage or condone any violation of applicable terms.
+
+2. **User Responsibility** — You are **solely responsible** for:
+   - Complying with YouTube's ToS and any applicable laws in your jurisdiction.
+   - How you use the content accessed through this application.
+   - Any consequences arising from your use of yt-dlp or this software.
+
+3. **Educational Purpose Only** — This software is provided **as-is**, without any warranty, for **educational and research purposes**. It is not intended for commercial use or mass content downloading.
+
+4. **No Affiliation** — This project is **not affiliated, endorsed, or sponsored** by YouTube, Google, or any other media platform.
+
+5. **Optional Dependency** — yt-dlp is **optional**. Sonic Player also supports:
+   - **Jamendo** (licensed, royalty-free music)
+   - **Local file playback** (MP3, FLAC, etc.)
+
+6. **No Liability** — The authors and contributors of Sonic Player shall **not be held liable** for any damages, legal issues, or claims arising from the use of this software.
+
+> **By using Sonic Player, you accept full responsibility for your actions.**
+
+---
+
+## 🏢 About CYBER · HACKER · Studio
+
+**CYBER · HACKER · Studio** is an indie development studio focused on building modern applications and open-source tools. We specialize in:
+
+- 📱 **Android App Development** — Native Kotlin / Jetpack Compose
+- 🎵 **Media Applications** — Music streaming, video processing
+- 🛠️ **Developer Tools** — CLI utilities, productivity apps
+- 🌐 **Open Source** — Free tools for the community
+
+Our mission is to build high-quality, practical software that pushes boundaries.
 
 ---
 
