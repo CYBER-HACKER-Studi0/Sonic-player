@@ -107,8 +107,32 @@ else
     if command -v "$dep" &>/dev/null; then
       ok "$dep $(command -v $dep)"
     else
-      fail "$dep not found. Please install Node.js 18+ and Python 3."
-      exit 1
+      if [ "$dep" = "node" ]; then
+        warn "Node.js not found. Attempting to install..."
+        if command -v nvm &>/dev/null; then
+          nvm install 18 2>&1
+        elif command -v apt-get &>/dev/null; then
+          # Debian/Ubuntu — install via NodeSource
+          curl -fsSL https://deb.nodesource.com/setup_22.x | bash - 2>&1 | tail -5
+          apt-get install -y nodejs 2>&1 | tail -5
+        elif command -v brew &>/dev/null; then
+          brew install node 2>&1 | tail -5
+        elif command -v pkg &>/dev/null; then
+          pkg install -y nodejs 2>&1
+        else
+          fail "Cannot auto-install Node.js. Please install Node.js 18+ manually."
+          fail "Visit: https://nodejs.org or use nvm: https://github.com/nvm-sh/nvm"
+          exit 1
+        fi
+        if ! command -v node &>/dev/null; then
+          fail "Node.js installation failed. Please install Node.js 18+ manually."
+          exit 1
+        fi
+        ok "Node.js installed: $(node --version)"
+      else
+        fail "$dep not found. Please install Python 3."
+        exit 1
+      fi
     fi
   done
 
