@@ -60,7 +60,6 @@
 ### Promotional videos
 
 - [Open the Sonic Player marketing video](promo/sonic_player_marketing_video.mp4)
-- [Open the original project promo](sonic_promo_final.mp4)
 
 > GitHub displays MP4 files as downloadable media links in the README. The poster and keyframes above provide an immediate visual preview of the product and its desktop identity.
 
@@ -161,7 +160,7 @@ After setup completes, start with:
 sh start.sh
 ```
 
-> **Note about backends:** The recommended backend is `server.py` — it uses Python stdlib only (zero dependencies, no pip packages needed except yt-dlp). The old `main.py` (FastAPI version) is **deprecated and no longer used**. `server.py` is ideal for Termux and resource-constrained environments.
+> **Backend:** The recommended backend is `server.py`. It uses Python stdlib plus `yt-dlp`, making it suitable for Termux and resource-constrained environments.
 
 ### YouTube authentication (when required)
 
@@ -201,15 +200,17 @@ The current development build passes TypeScript, Next.js production build, Pytho
 sonic-player/
 ├── app/components/       # React components (16 files)
 ├── backend/
-│   ├── server.py         # ✅ Recommended backend — zero deps (stdlib only)
-│   ├── main.py           # ❌ Deprecated — FastAPI version (no longer used)
-│   └── downloads/        # Offline downloaded files
+│   ├── server.py         # Recommended backend — stdlib + yt-dlp
+│   ├── requirements.txt  # Backend dependency declaration
+│   └── downloads/        # Local downloaded files (ignored)
 ├── lib/                  # State, API, storage, preloader
-├── promo/                # Screenshots, poster, keyframes, and marketing videos
+├── docs/                 # Feature and quality documentation
+├── promo/                # Screenshots, poster, keyframe, and marketing video
+├── public/               # Service Worker, manifest, and static assets
 ├── PRIVACY.md            # Privacy policy
 ├── LICENSE               # MIT License
-├── demo.html             # Live demo page
 ├── install.sh            # Termux/Linux installer
+├── setup-termux.sh       # Android/Termux setup
 ├── start.sh              # Quick launcher
 └── README.md
 ```
