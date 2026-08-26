@@ -166,7 +166,29 @@ After setup completes, start with:
 sh start.sh
 ```
 
-> **Note about backends:** The recommended backend is `server.py` — it uses Python stdlib only (zero dependencies, no pip packages needed except yt-dlp). The old `main.py` (FastAPI version) is **deprecated and no longer used**. `server.py` is ideal for Termux and resource-constrained environments. 🎉
+> **Note about backends:** The recommended backend is `server.py` — it uses Python stdlib only (zero dependencies, no pip packages needed except yt-dlp). The old `main.py` (FastAPI version) is **deprecated and no longer used**. `server.py` is ideal for Termux and resource-constrained environments.
+
+### YouTube authentication (when required)
+
+YouTube may occasionally require authentication before `yt-dlp` can extract an audio or video stream. If that happens, provide either a Netscape-format cookies file or a browser profile when starting the backend:
+
+```bash
+SONIC_YTDLP_COOKIES=/path/to/youtube-cookies.txt python3 backend/server.py
+# or, for a supported local browser profile:
+SONIC_YTDLP_BROWSER=chromium python3 backend/server.py
+```
+
+The backend returns a clear `503` response when a stream cannot be extracted instead of caching an empty URL. This keeps the player from attempting to play a JSON error response.
+
+### Backend smoke tests
+
+After starting the backend, run the included smoke-test suite:
+
+```bash
+bash scripts/test_backend.sh
+```
+
+The suite covers health checks, invalid query parameters, media ID validation, proxy restrictions, local files, and a live YouTube search.
 
 Open **http://localhost:3004** in your browser.
 

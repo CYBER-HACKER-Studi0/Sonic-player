@@ -16,9 +16,11 @@ export default function AudioEngine() {
   const setProgress = usePlayerStore((s) => s.setProgress)
   const setDuration = usePlayerStore((s) => s.setDuration)
   const next = usePlayerStore((s) => s.next)
+  const pause = usePlayerStore((s) => s.pause)
   const setLoading = usePlayerStore((s) => s.setLoading)
   const queue = usePlayerStore((s) => s.queue)
   const queueIndex = usePlayerStore((s) => s.queueIndex)
+  const setPlaybackError = usePlayerStore((s) => s.setPlaybackError)
 
   // Init both audio elements
   useEffect(() => {
@@ -45,6 +47,7 @@ export default function AudioEngine() {
 
     const loadAudio = async () => {
       setLoading(true)
+      setPlaybackError(null)
 
       // Detach old listeners on nextAudio
       if (nextAudio) {
@@ -61,16 +64,21 @@ export default function AudioEngine() {
             audio.src = `${BACKEND}/proxy?url=${encodeURIComponent(cachedUrl)}`
           } else {
             const res = await fetch(currentTrack.audio)
-            const data = await res.json()
-            if (data.audio_url) {
-              audio.crossOrigin = 'anonymous'
-              audio.src = `${BACKEND}/proxy?url=${encodeURIComponent(data.audio_url)}`
-            } else {
-              audio.src = currentTrack.audio
+            const data = await res.json().catch(() => ({}))
+            if (!res.ok || !data.audio_url) {
+              throw new Error(data.error || 'YouTube audio is unavailable')
             }
+            audio.crossOrigin = 'anonymous'
+            audio.src = `${BACKEND}/proxy?url=${encodeURIComponent(data.audio_url)}`
           }
-        } catch {
-          audio.src = currentTrack.audio
+        } catch (error) {
+          audio.pause()
+          pause()
+          audio.removeAttribute('src')
+          audio.load()
+          setPlaybackError(error instanceof Error ? error.message : 'YouTube audio is unavailable')
+          setLoading(false)
+          return
         }
       } else if (currentTrack.source === 'Jamendo' || currentTrack.source === 'Local') {
         audio.crossOrigin = 'anonymous'
@@ -171,6 +179,10 @@ export default function AudioEngine() {
     }
     const onError = () => {
       setLoading(false)
+      if (currentTrack?.source === 'YouTube') {
+        pause()
+        setPlaybackError('Unable to play this YouTube stream. Configure yt-dlp authentication or try another track.')
+      }
       if (currentTrack?.source === 'Demo') {
         setTimeout(() => next(), 1000)
       }

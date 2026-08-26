@@ -4,30 +4,20 @@ import { useState, useEffect, useRef } from 'react'
 import { usePlayerStore } from '@/lib/player-store'
 import Visualizer from './Visualizer'
 
-const BACKEND = 'http://localhost:8005'
-
 export default function NowPlaying() {
   const currentTrack = usePlayerStore((s) => s.currentTrack)
   const isPlaying = usePlayerStore((s) => s.isPlaying)
   const isLoading = usePlayerStore((s) => s.isLoading)
+  const playbackError = usePlayerStore((s) => s.playbackError)
   const videoMode = usePlayerStore((s) => s.videoMode)
   const toggleVideoMode = usePlayerStore((s) => s.toggleVideoMode)
   const cycleVisualizer = usePlayerStore((s) => s.cycleVisualizer)
   const visualizerType = usePlayerStore((s) => s.visualizerType)
-  const [videoUrl, setVideoUrl] = useState('')
   const [videoLoading, setVideoLoading] = useState(false)
 
-  // Fetch video URL when video mode is toggled
+  // The iframe is the source of truth for video playback; no redundant yt-dlp request is needed.
   useEffect(() => {
-    if (!videoMode || !currentTrack?.videoId) {
-      setVideoUrl('')
-      return
-    }
-    setVideoLoading(true)
-    fetch(`${BACKEND}/video_stream/${currentTrack.videoId}`)
-      .then(r => r.json())
-      .then(d => { setVideoUrl(d.video_url || ''); setVideoLoading(false) })
-      .catch(() => setVideoLoading(false))
+    setVideoLoading(videoMode && !!currentTrack?.videoId)
   }, [videoMode, currentTrack?.id])
 
   // ── خلفية جزيئات مكبرة مع connection lines ──
@@ -214,6 +204,7 @@ export default function NowPlaying() {
                     src={`https://www.youtube.com/embed/${currentTrack.videoId}?autoplay=1&controls=1&modestbranding=1`}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope"
+                    onLoad={() => setVideoLoading(false)}
                     allowFullScreen
                   />
                 </div>
@@ -272,13 +263,18 @@ export default function NowPlaying() {
                 {currentTrack.title}
               </h2>
               <p className="text-sonic-textMuted text-sm truncate mt-0.5">{currentTrack.artist}</p>
-              {isLoading && (
+              {isLoading && !playbackError && (
                 <div className="flex items-center justify-center gap-1.5 mt-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#e8c547] animate-wave" style={{animationDelay: '0s'}} />
                   <div className="w-1.5 h-1.5 rounded-full bg-[#e8c547] animate-wave" style={{animationDelay: '0.2s'}} />
                   <div className="w-1.5 h-1.5 rounded-full bg-[#e8c547] animate-wave" style={{animationDelay: '0.4s'}} />
                   <span className="text-[10px] text-sonic-textMuted/50 ml-1.5">Loading stream...</span>
                 </div>
+              )}
+              {playbackError && (
+                <p className="text-[10px] text-red-300/80 mt-2 max-w-xs" role="status">
+                  {playbackError}
+                </p>
               )}
             </div>
 

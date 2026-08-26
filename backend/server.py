@@ -24,6 +24,8 @@ from pathlib import Path
 PORT = 8005
 CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sonic_cache.json')
 DOWNLOADS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
+YTDLP_COOKIES = os.environ.get('SONIC_YTDLP_COOKIES', '').strip()
+YTDLP_BROWSER = os.environ.get('SONIC_YTDLP_BROWSER', '').strip()
 
 # ── Allowed domains for /proxy endpoint ──
 ALLOWED_PROXY_DOMAINS = ('youtube.com', 'googlevideo.com', 'ytimg.com', 'lrclib.net')
@@ -149,6 +151,23 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         params = urllib.parse.parse_qs(parsed.query)
         return {k: v[0] for k, v in params.items()}
 
+    def _get_int_param(self, params, name, default, minimum=None, maximum=None):
+        """Parse and clamp an integer query parameter with a useful client error."""
+        raw_value = params.get(name)
+        if raw_value is None or raw_value.strip() == '':
+            value = default
+        else:
+            try:
+                value = int(raw_value)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f'{name} must be an integer') from exc
+
+        if minimum is not None:
+            value = max(value, minimum)
+        if maximum is not None:
+            value = min(value, maximum)
+        return value
+
     def _sanitize_video_id(self, vid):
         """
         Validate video ID: must be exactly 11 chars of [a-zA-Z0-9_-].
@@ -203,17 +222,29 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
                 rate_limit[ip] = [1, now]
                 return True
 
+    def _ytdlp_args(self, args):
+        """Add optional user-provided YouTube authentication to yt-dlp calls."""
+        auth_args = []
+        if YTDLP_COOKIES and os.path.isfile(YTDLP_COOKIES):
+            auth_args = ['--cookies', YTDLP_COOKIES]
+        elif YTDLP_BROWSER:
+            auth_args = ['--cookies-from-browser', YTDLP_BROWSER]
+        return auth_args + args
+
+    def _ytdlp_commands(self, args):
+        """Build yt-dlp command fallbacks with the same authentication settings."""
+        configured_args = self._ytdlp_args(args)
+        return [
+            ['yt-dlp'] + configured_args,
+            ['python3', '-m', 'yt_dlp'] + configured_args,
+            ['python', '-m', 'yt_dlp'] + configured_args,
+        ]
+
     def _run_ytdlp(self, args, timeout=30):
         """Run yt-dlp with given args, return stdout."""
         # Clamp timeout to max 120 seconds
         timeout = min(timeout, 120)
-        # Try direct command first, then python -m fallback
-        commands = [
-            ['yt-dlp'] + args,
-            ['python3', '-m', 'yt_dlp'] + args,
-            ['python', '-m', 'yt_dlp'] + args,
-        ]
-        for cmd in commands:
+        for cmd in self._ytdlp_commands(args):
             try:
                 result = subprocess.run(
                     cmd,
@@ -227,6 +258,20 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
             except subprocess.TimeoutExpired:
                 return '', 1
         return '', -1
+
+    def _run_ytdlp_bytes(self, args, timeout=120):
+        """Run yt-dlp and return binary stdout for download endpoints."""
+        timeout = min(timeout, 120)
+        for cmd in self._ytdlp_commands(args):
+            try:
+                result = subprocess.run(cmd, capture_output=True, timeout=timeout)
+                if result.returncode == 0 and result.stdout:
+                    return result.stdout, result.returncode
+            except FileNotFoundError:
+                continue
+            except subprocess.TimeoutExpired:
+                return b'', 1
+        return b'', -1
 
     def _route(self):
         """Route request to appropriate handler."""
@@ -267,8 +312,11 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
             q = self._sanitize_search_query(q)
             if not q:
                 return self._send_error('invalid query after sanitization')
-            limit = min(int(params.get('limit', 20)), 200)
-            offset = max(int(params.get('offset', 0)), 0)
+            try:
+                limit = self._get_int_param(params, 'limit', 20, minimum=1, maximum=200)
+                offset = self._get_int_param(params, 'offset', 0, minimum=0)
+            except ValueError as exc:
+                return self._send_error(str(exc), 400)
             return self._handle_search(q, limit, offset)
 
         # ── Search Playlists ──
@@ -277,7 +325,10 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
             if not q:
                 return self._send_json({'playlists': []})
             q = self._sanitize_search_query(q)
-            limit = min(int(params.get('limit', 10)), 20)
+            try:
+                limit = self._get_int_param(params, 'limit', 10, minimum=1, maximum=20)
+            except ValueError as exc:
+                return self._send_error(str(exc), 400)
             return self._handle_search_playlists(q, limit)
 
         # ── Uploader Tracks ──
@@ -286,7 +337,10 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
             if not uploader:
                 return self._send_json({'results': []})
             uploader = self._sanitize_search_query(uploader)
-            limit = min(int(params.get('limit', 20)), 50)
+            try:
+                limit = self._get_int_param(params, 'limit', 20, minimum=1, maximum=50)
+            except ValueError as exc:
+                return self._send_error(str(exc), 400)
             return self._handle_uploader_tracks(uploader, limit)
 
         # ── Stream URL ──
@@ -532,8 +586,9 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         with cache_lock:
             if vid in cache.get('stream_url', {}):
                 entry = cache['stream_url'][vid]
-                if time.time() - entry.get('time', 0) < 7200:
-                    return self._send_json(entry['data'])
+                cached_data = entry.get('data', {})
+                if time.time() - entry.get('time', 0) < 7200 and cached_data.get('audio_url'):
+                    return self._send_json(cached_data)
 
         safe_vid = shlex.quote(vid)
         audio_url, rc = self._run_ytdlp([
@@ -548,12 +603,19 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
                 f'https://www.youtube.com/watch?v={safe_vid}'
             ], timeout=30)
 
+        if not audio_url:
+            return self._send_json({
+                'error': 'audio stream unavailable',
+                'hint': 'YouTube may require authentication; set SONIC_YTDLP_COOKIES or SONIC_YTDLP_BROWSER',
+                'video_id': vid,
+            }, 503)
+
         data = {
             'title': '',
             'uploader': '',
             'duration': 0,
             'thumbnail': f'https://img.youtube.com/vi/{vid}/hqdefault.jpg',
-            'audio_url': audio_url or '',
+            'audio_url': audio_url,
         }
         with cache_lock:
             if 'stream_url' not in cache:
@@ -576,8 +638,9 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
             with cache_lock:
                 if vid in cache.get('stream_url', {}):
                     entry = cache['stream_url'][vid]
-                    if time.time() - entry.get('time', 0) < 7200:
-                        urls[vid] = entry['data'].get('audio_url', '')
+                    cached_url = entry.get('data', {}).get('audio_url', '')
+                    if time.time() - entry.get('time', 0) < 7200 and cached_url:
+                        urls[vid] = cached_url
                         continue
             # Extract
             safe_vid = shlex.quote(vid)
@@ -608,8 +671,9 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
 
         cache_key = f'video_{vid}'
         with cache_lock:
-            if cache_key in cache and time.time() - cache.get(cache_key, {}).get('time', 0) < 7200:
-                return self._send_json(cache[cache_key])
+            cached_video = cache.get(cache_key, {})
+            if cached_video.get('video_url') and time.time() - cached_video.get('time', 0) < 7200:
+                return self._send_json(cached_video)
 
         safe_vid = shlex.quote(vid)
         video_url, rc = self._run_ytdlp([
@@ -624,7 +688,14 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
                 f'https://www.youtube.com/watch?v={safe_vid}'
             ], timeout=30)
 
-        data = {'video_url': video_url or ''}
+        if not video_url:
+            return self._send_json({
+                'error': 'video stream unavailable',
+                'hint': 'YouTube may require authentication; set SONIC_YTDLP_COOKIES or SONIC_YTDLP_BROWSER',
+                'video_id': vid,
+            }, 503)
+
+        data = {'video_url': video_url}
         with cache_lock:
             cache[cache_key] = data
         save_cache()
@@ -712,29 +783,27 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
 
         safe_vid = shlex.quote(vid)
         try:
-            result = subprocess.run(
-                ['yt-dlp', '-f', 'bestaudio[ext=m4a]/bestaudio/best',
-                 '-o', '-', '--no-warnings', '--quiet',
-                 f'https://www.youtube.com/watch?v={safe_vid}'],
-                capture_output=True, timeout=120
-            )
-            if result.returncode != 0 or len(result.stdout) == 0:
+            payload, returncode = self._run_ytdlp_bytes([
+                '-f', 'bestaudio[ext=m4a]/bestaudio/best',
+                '-o', '-', '--no-warnings', '--quiet',
+                f'https://www.youtube.com/watch?v={safe_vid}'
+            ])
+            if returncode != 0 or not payload:
                 # Fallback: download without format restriction
-                result = subprocess.run(
-                    ['yt-dlp', '-f', 'bestaudio', '-o', '-',
-                     '--no-warnings', '--quiet',
-                     f'https://www.youtube.com/watch?v={safe_vid}'],
-                    capture_output=True, timeout=120
-                )
-            if result.returncode != 0 or len(result.stdout) == 0:
-                return self._send_error(f'download failed (exit: {result.returncode})', 500)
+                payload, returncode = self._run_ytdlp_bytes([
+                    '-f', 'bestaudio', '-o', '-',
+                    '--no-warnings', '--quiet',
+                    f'https://www.youtube.com/watch?v={safe_vid}'
+                ])
+            if returncode != 0 or not payload:
+                return self._send_error(f'download failed (exit: {returncode})', 500)
             self.send_response(200)
             self.send_header('Content-Type', 'audio/mp4')
             self.send_header('Content-Disposition', f'attachment; filename="{vid}.m4a"')
             self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Content-Length', str(len(result.stdout)))
+            self.send_header('Content-Length', str(len(payload)))
             self.end_headers()
-            self.wfile.write(result.stdout)
+            self.wfile.write(payload)
         except subprocess.TimeoutExpired:
             self._send_error('download timed out', 500)
         except Exception as e:
@@ -757,21 +826,20 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
 
         safe_vid = shlex.quote(vid)
         try:
-            result = subprocess.run(
-                ['yt-dlp', '-f', fmt, '-o', '-',
-                 '--no-warnings', '--quiet',
-                 f'https://www.youtube.com/watch?v={safe_vid}'],
-                capture_output=True, timeout=120  # capped at 120s
-            )
-            if result.returncode != 0 or len(result.stdout) == 0:
-                return self._send_error(f'video download failed (exit: {result.returncode})', 500)
+            payload, returncode = self._run_ytdlp_bytes([
+                '-f', fmt, '-o', '-',
+                '--no-warnings', '--quiet',
+                f'https://www.youtube.com/watch?v={safe_vid}'
+            ])
+            if returncode != 0 or not payload:
+                return self._send_error(f'video download failed (exit: {returncode})', 500)
             self.send_response(200)
             self.send_header('Content-Type', 'video/mp4')
             self.send_header('Content-Disposition', f'attachment; filename="{vid}.mp4"')
             self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Content-Length', str(len(result.stdout)))
+            self.send_header('Content-Length', str(len(payload)))
             self.end_headers()
-            self.wfile.write(result.stdout)
+            self.wfile.write(payload)
         except Exception as e:
             self._send_error(f'video download failed: {str(e)}', 500)
 
@@ -786,13 +854,12 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
 
         safe_vid = shlex.quote(vid)
         try:
-            subprocess.run(
-                ['yt-dlp', '-f', 'bestaudio[ext=m4a]/bestaudio/best', '-o', save_path,
-                 '--no-warnings', '--quiet',
-                 f'https://www.youtube.com/watch?v={safe_vid}'],
-                capture_output=True, timeout=120
-            )
-            if os.path.exists(save_path):
+            _, returncode = self._run_ytdlp([
+                '-f', 'bestaudio[ext=m4a]/bestaudio/best', '-o', save_path,
+                '--no-warnings', '--quiet',
+                f'https://www.youtube.com/watch?v={safe_vid}'
+            ], timeout=120)
+            if returncode == 0 and os.path.exists(save_path):
                 size = os.path.getsize(save_path)
                 return self._send_json({
                     'path': f'/local_play/{os.path.basename(save_path)}',
@@ -879,9 +946,16 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         self._route()
 
 
+class ReusableThreadingTCPServer(socketserver.ThreadingTCPServer):
+    """Threaded server that can be restarted without waiting for TIME_WAIT sockets."""
+
+    allow_reuse_address = True
+    allow_reuse_port = True
+    daemon_threads = True
+
+
 def run_server():
-    server = socketserver.ThreadingTCPServer(('0.0.0.0', PORT), SonicHandler)
-    server.allow_reuse_address = True
+    server = ReusableThreadingTCPServer(('0.0.0.0', PORT), SonicHandler)
     print(f'[Sonic] Backend running on http://localhost:{PORT}')
     print(f'[Sonic] Multi-threaded — zero dependencies!')
     try:

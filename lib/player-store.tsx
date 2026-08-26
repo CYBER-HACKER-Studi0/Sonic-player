@@ -24,6 +24,7 @@ interface PlayerState {
   queueIndex: number
   isPlaying: boolean
   isLoading: boolean
+  playbackError: string | null
   volume: number
   progress: number
   duration: number
@@ -37,6 +38,7 @@ interface PlayerState {
   pause: () => void
   togglePlay: () => void
   setLoading: (v: boolean) => void
+  setPlaybackError: (message: string | null) => void
   setVolume: (v: number) => void
   setProgress: (p: number) => void
   setDuration: (d: number) => void
@@ -66,6 +68,7 @@ export function createPlayerStore() {
     queueIndex: -1,
     isPlaying: false,
     isLoading: false,
+    playbackError: null,
     volume: 0.7,
     progress: 0,
     duration: 0,
@@ -76,13 +79,14 @@ export function createPlayerStore() {
 
     setCurrentTrack: (track) => {
       trackStarted(track)
-      set({ currentTrack: track, queueIndex: 0 })
+      set({ currentTrack: track, queueIndex: 0, playbackError: null })
     },
 
     play: () => set({ isPlaying: true }),
     pause: () => set({ isPlaying: false }),
     togglePlay: () => set((s) => ({ isPlaying: !s.isPlaying })),
     setLoading: (v) => set({ isLoading: v }),
+    setPlaybackError: (message) => set({ playbackError: message }),
 
     setVolume: (v) => set({ volume: Math.max(0, Math.min(1, v)) }),
     setProgress: (p) => set({ progress: p }),
@@ -105,7 +109,7 @@ export function createPlayerStore() {
         }
       }
 
-      set({ queueIndex: nextIndex, currentTrack: queue[nextIndex], progress: 0, isPlaying: true })
+      set({ queueIndex: nextIndex, currentTrack: queue[nextIndex], progress: 0, isPlaying: true, playbackError: null })
       trackStarted(queue[nextIndex])
     },
 
@@ -119,7 +123,7 @@ export function createPlayerStore() {
       }
 
       const prevIndex = queueIndex - 1 >= 0 ? queueIndex - 1 : queue.length - 1
-      set({ queueIndex: prevIndex, currentTrack: queue[prevIndex], progress: 0, isPlaying: true })
+      set({ queueIndex: prevIndex, currentTrack: queue[prevIndex], progress: 0, isPlaying: true, playbackError: null })
       trackStarted(queue[prevIndex])
     },
 
@@ -141,6 +145,7 @@ export function createPlayerStore() {
         currentTrack: track,
         progress: 0,
         isPlaying: true,
+        playbackError: null,
       })
     },
 
