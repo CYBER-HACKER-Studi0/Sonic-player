@@ -209,6 +209,35 @@ export async function getRecommendations(genres: string[], limit = 20): Promise<
 }
 
 /**
+ * Personalized recommendations based on the artists the user actually plays.
+ * This runs with normal search APIs, so it does not send listening history to a third party.
+ */
+export async function getArtistRecommendations(
+  artists: string[],
+  excludeIds: Set<string> = new Set(),
+  limit = 20,
+): Promise<TrackResult[]> {
+  const preferredArtists = artists.filter(Boolean).slice(0, 3)
+  if (preferredArtists.length === 0) return []
+
+  const batches = await Promise.all(
+    preferredArtists.map((artist) => searchAll(`${artist} music`, 0, 8).catch(() => [] as TrackResult[]))
+  )
+  const seen = new Set(excludeIds)
+  const personalized: TrackResult[] = []
+
+  for (const batch of batches) {
+    for (const track of batch) {
+      if (seen.has(track.id)) continue
+      seen.add(track.id)
+      personalized.push(track)
+      if (personalized.length >= limit) return personalized
+    }
+  }
+  return personalized
+}
+
+/**
  * Get more like this — similar tracks to one the user liked
  */
 export async function getMoreLikeThis(track: TrackResult, limit = 12): Promise<TrackResult[]> {

@@ -10,6 +10,7 @@ import PlayerBar from './components/PlayerBar'
 import AudioEngine from './components/AudioEngine'
 import SettingsPanel from './components/SettingsPanel'
 import PlaylistPanel from './components/PlaylistPanel'
+import NetworkStatus from './components/NetworkStatus'
 import SplashScreen from './components/SplashScreen'
 
 export default function Home() {
@@ -42,6 +43,7 @@ export default function Home() {
 
   return (
     <>
+      <NetworkStatus />
       <AudioEngine />
       <Sidebar
         onOpenSettings={() => setSettingsOpen(true)}
@@ -50,12 +52,12 @@ export default function Home() {
       />
       <main className="flex-1 flex flex-col min-w-0">
         <div className="flex-1 flex overflow-hidden">
-          <div id="main-view" className="flex-1 overflow-y-auto">
+          <div id="main-view" className="flex-1 min-w-0 overflow-y-auto pb-16 md:pb-0">
             {view === 'home' && <HomeView />}
             {view === 'search' && <SearchView />}
             {view === 'library' && <LibraryView />}
           </div>
-          <div className="w-[400px] border-l border-sonic-border flex flex-col">
+          <div className="hidden md:flex w-[400px] border-l border-sonic-border flex-col">
             <NowPlaying />
           </div>
         </div>

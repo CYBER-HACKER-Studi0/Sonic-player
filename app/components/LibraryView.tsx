@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { usePlayerStore } from '@/lib/player-store'
-import { getLikes, toggleLike, getHistory, clearHistory, getDownloads, trackDownload, createPlaylist, deletePlaylist, getPlaylists, addToPlaylist, removeFromPlaylist } from '@/lib/storage'
+import { getLikes, toggleLike, getHistory, clearHistory, getDownloads, createPlaylist, deletePlaylist, getPlaylists, addToPlaylist, removeFromPlaylist } from '@/lib/storage'
 import type { Playlist } from '@/lib/storage'
 import type { Track } from '@/lib/player-store'
-
-const BACKEND = 'http://localhost:8005'
 
 export default function LibraryView() {
   const setQueue = usePlayerStore((s) => s.setQueue)
@@ -41,6 +39,7 @@ export default function LibraryView() {
       <div className="flex-1 min-w-0 text-left">
         <p className={`text-sm font-medium truncate ${currentTrack?.id === track.id ? 'text-[#e8c547]' : 'text-sonic-textPrimary'}`}>{track.title}</p>
         <p className="text-xs text-sonic-textMuted truncate">{track.artist}</p>
+        {track.source === 'Local' && <span className="text-[9px] text-[#e8c547]/70">Available offline</span>}
       </div>
       <button onClick={(e) => { e.stopPropagation(); toggleLike(track.id); onRemove?.() }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill={getLikes().includes(track.id) ? '#e8c547' : 'none'} stroke={getLikes().includes(track.id) ? '#e8c547' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -52,7 +51,7 @@ export default function LibraryView() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="pt-8 pb-6 px-8">
+      <div className="pt-5 md:pt-8 pb-4 md:pb-6 px-4 md:px-8">
         <div className="flex items-center gap-2 mb-4">
           <svg className="w-5 h-5 text-[#e8c547]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" />
@@ -75,7 +74,7 @@ export default function LibraryView() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 pb-8">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-8">
         {/* Liked Songs */}
         {tab === 'liked' && (
           <div className="space-y-2">
@@ -150,7 +149,7 @@ export default function LibraryView() {
       </div>
 
       {/* Branding Footer */}
-      <div className="px-8 py-4 border-t border-sonic-border flex items-center justify-between">
+      <div className="px-4 md:px-8 py-4 border-t border-sonic-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded bg-gradient-to-br from-[#e8c547] to-[#b8962e] flex items-center justify-center text-[8px] font-bold text-sonic-base">S</div>
           <span className="text-[10px] text-sonic-textMuted/40">Sonic Player by</span>

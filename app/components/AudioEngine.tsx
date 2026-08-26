@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from 'react'
 import { usePlayerStore } from '@/lib/player-store'
-import { addToHistory } from '@/lib/storage'
+import { addToHistory, getOfflineAudioUrl } from '@/lib/storage'
 import { preloadNextTrack, getPreloadedUrl } from '@/lib/preloader'
 
 const BACKEND = 'http://localhost:8005'
@@ -10,6 +10,7 @@ const BACKEND = 'http://localhost:8005'
 export default function AudioEngine() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const nextAudioRef = useRef<HTMLAudioElement | null>(null) // Pre-buffer audio
+  const offlineObjectUrlRef = useRef<string | null>(null)
   const currentTrack = usePlayerStore((s) => s.currentTrack)
   const isPlaying = usePlayerStore((s) => s.isPlaying)
   const volume = usePlayerStore((s) => s.volume)
@@ -48,6 +49,10 @@ export default function AudioEngine() {
     const loadAudio = async () => {
       setLoading(true)
       setPlaybackError(null)
+      if (offlineObjectUrlRef.current) {
+        URL.revokeObjectURL(offlineObjectUrlRef.current)
+        offlineObjectUrlRef.current = null
+      }
 
       // Detach old listeners on nextAudio
       if (nextAudio) {
@@ -81,8 +86,26 @@ export default function AudioEngine() {
           return
         }
       } else if (currentTrack.source === 'Jamendo' || currentTrack.source === 'Local') {
-        audio.crossOrigin = 'anonymous'
-        audio.src = currentTrack.audio
+        try {
+          audio.crossOrigin = 'anonymous'
+          if (currentTrack.audio.startsWith('offline://')) {
+            const offlineId = decodeURIComponent(currentTrack.audio.slice('offline://'.length))
+            const offlineUrl = await getOfflineAudioUrl(offlineId)
+            if (!offlineUrl) throw new Error('This download is not available on this device')
+            offlineObjectUrlRef.current = offlineUrl
+            audio.src = offlineUrl
+          } else {
+            audio.src = currentTrack.audio
+          }
+        } catch (error) {
+          audio.pause()
+          pause()
+          audio.removeAttribute('src')
+          audio.load()
+          setPlaybackError(error instanceof Error ? error.message : 'Offline audio is unavailable')
+          setLoading(false)
+          return
+        }
       } else {
         audio.src = ''
       }
@@ -123,7 +146,12 @@ export default function AudioEngine() {
           }
         }
       } else if (track.source === 'Jamendo' || track.source === 'Local') {
-        src = track.audio
+        if (track.audio.startsWith('offline://')) {
+          const offlineId = decodeURIComponent(track.audio.slice('offline://'.length))
+          src = await getOfflineAudioUrl(offlineId) || ''
+        } else {
+          src = track.audio
+        }
       }
       if (src) {
         audioEl.crossOrigin = 'anonymous'

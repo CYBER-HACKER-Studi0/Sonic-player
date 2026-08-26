@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { usePlayerStore } from '@/lib/player-store'
 
 let audioCtx: AudioContext | null = null
@@ -36,6 +36,15 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
   const volume = usePlayerStore((s) => s.volume)
   const currentTrack = usePlayerStore((s) => s.currentTrack)
   const animRef = useRef<number>(0)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)')
+    const update = () => setIsMobile(media.matches || (navigator.hardwareConcurrency || 8) <= 4)
+    update()
+    media.addEventListener?.('change', update)
+    return () => media.removeEventListener?.('change', update)
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -44,21 +53,23 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
     if (!ctx) return
 
     const resize = () => {
-      const dpr = window.devicePixelRatio || 1
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 2)
       canvas.width = canvas.clientWidth * dpr
       canvas.height = canvas.clientHeight * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
     resize()
     window.addEventListener('resize', resize)
 
-    const bars = 96
+    const bars = isMobile ? 48 : 96
     const data = new Float32Array(bars).fill(0)
     const freqData = new Uint8Array(bars)
     let phase = 0
-    let particles: { x: number; y: number; vx: number; vy: number; r: number; a: number }[] = []
+    let lastFrame = 0
+    const particles: { x: number; y: number; vx: number; vy: number; r: number; a: number }[] = []
+    const particleCount = isMobile ? 24 : 160
 
-    // Init particles × 2
-    for (let i = 0; i < 160; i++) {
+    for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * 600,
         y: Math.random() * height,
@@ -69,7 +80,14 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
       })
     }
 
-    const draw = () => {
+    const renderType = isMobile && (type === 'plasma' || type === 'aurora' || type === 'fire') ? 'bars' : type
+
+    const draw = (timestamp = 0) => {
+      if (isMobile && timestamp - lastFrame < 33) {
+        animRef.current = requestAnimationFrame(draw)
+        return
+      }
+      lastFrame = timestamp
       const w = canvas!.clientWidth
       const h = canvas!.clientHeight
       ctx!.clearRect(0, 0, w, h)
@@ -102,7 +120,7 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
       }
 
       // ── BARS MODE (مكبر × 2) ──
-      if (type === 'bars') {
+      if (renderType === 'bars') {
         const gap = 1
         const barW = (w - gap * (bars - 1)) / bars
         const centerH = h * 0.45
@@ -154,7 +172,7 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
         ctx!.fillRect(0, h / 2 - 1.5, w, 3)
 
       // ── WAVE MODE (مكبر) ──
-      } else if (type === 'wave') {
+      } else if (renderType === 'wave') {
         // Wave 1 — main
         ctx!.beginPath()
         const centerY = h / 2
@@ -200,7 +218,7 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
         ctx!.fill()
 
       // ── CIRCLE MODE (مكبر × 2) ──
-      } else if (type === 'circle') {
+      } else if (renderType === 'circle') {
         const cx = w / 2
         const cy = h / 2
         const radius = Math.min(w, h) * 0.35
@@ -247,7 +265,7 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
         ctx!.fill()
 
       // ── FIRE MODE (مكبر) ──
-      } else if (type === 'fire') {
+      } else if (renderType === 'fire') {
         // Bottom-up fire bars — أوسع
         const barW = w / bars
         for (let i = 0; i < bars; i++) {
@@ -286,7 +304,7 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
         }
 
       // ── AURORA MODE (مكبرة) ──
-      } else if (type === 'aurora') {
+      } else if (renderType === 'aurora') {
         // Aurora layers — 4 بدل 3، أوسع
         for (let layer = 0; layer < 4; layer++) {
           ctx!.beginPath()
@@ -339,7 +357,7 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
         }
 
       // ── PLASMA MODE ──
-      } else if (type === 'plasma') {
+      } else if (renderType === 'plasma') {
         const imgData = ctx!.createImageData(w, h)
         const d = imgData.data
         for (let y = 0; y < h; y++) {
@@ -356,7 +374,7 @@ export default function Visualizer({ height = 400 }: { height?: number }) {
         ctx!.putImageData(imgData, 0, 0)
 
       // ── RINGS MODE ──
-      } else if (type === 'rings') {
+      } else if (renderType === 'rings') {
         const cx = w / 2
         const cy = h / 2
         const maxR = Math.sqrt(w * w + h * h) / 2

@@ -48,10 +48,10 @@ export default function PlayerBar() {
   }, [setVolume])
 
   return (
-    <div className="h-[72px] border-t border-sonic-border bg-sonic-surface1/95 backdrop-blur-xl shrink-0">
-      <div className="flex items-center h-full px-4 gap-4">
+    <div className="h-[64px] md:h-[72px] border-t border-sonic-border bg-sonic-surface1/95 backdrop-blur-xl shrink-0">
+      <div className="flex items-center h-full px-2 md:px-4 gap-2 md:gap-4">
         {/* Track Info */}
-        <div className="w-[200px] flex items-center gap-3">
+        <div className="flex-1 min-w-0 md:flex-none md:w-[200px] flex items-center gap-2 md:gap-3">
           <div className="w-10 h-10 rounded-lg bg-sonic-surface3 overflow-hidden shrink-0">
             {currentTrack?.source === 'Demo' || !currentTrack ? (
               <div className="w-full h-full flex items-center justify-center">
@@ -76,9 +76,9 @@ export default function PlayerBar() {
         </div>
 
         {/* Controls */}
-        <div className="flex-1 flex flex-col items-center gap-1 max-w-2xl mx-auto">
-          <div className="flex items-center gap-4">
-            <button onClick={toggleShuffle} className={`magnetic ${isShuffled ? 'text-[#e8c547]' : 'text-sonic-textMuted'}`}>
+        <div className="flex-none md:flex-1 min-w-0 flex flex-col items-center gap-1 max-w-2xl mx-auto">
+          <div className="flex items-center gap-2 md:gap-4">
+            <button onClick={toggleShuffle} className={`magnetic hidden md:block ${isShuffled ? 'text-[#e8c547]' : 'text-sonic-textMuted'}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="16 3 21 3 21 8" />
                 <line x1="4" y1="20" x2="21" y2="3" />
@@ -112,7 +112,7 @@ export default function PlayerBar() {
                 <path d="M5 4l10 8-10 8V4zM17 5v14h2V5h-2z" />
               </svg>
             </button>
-            <button onClick={toggleRepeat} className={`magnetic ${repeat !== 'off' ? 'text-[#e8c547]' : 'text-sonic-textMuted'}`}>
+            <button onClick={toggleRepeat} className={`magnetic hidden md:block ${repeat !== 'off' ? 'text-[#e8c547]' : 'text-sonic-textMuted'}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="17 1 21 5 17 9" />
                 <path d="M3 11V9a4 4 0 014-4h14" />
@@ -123,7 +123,7 @@ export default function PlayerBar() {
             </button>
           </div>
 
-          <div className="flex items-center gap-3 w-full">
+          <div className="hidden sm:flex items-center gap-3 w-full">
             <span className="text-[11px] text-sonic-textMuted/60 w-8 text-right tabular-nums">
               {formatTime(progress)}
             </span>
@@ -137,7 +137,7 @@ export default function PlayerBar() {
         </div>
 
         {/* Volume & Queue */}
-        <div className="w-[200px] flex items-center justify-end gap-3">
+        <div className="hidden md:flex w-[200px] items-center justify-end gap-3">
           <div className="flex items-center gap-2">
             <button className="text-sonic-textMuted hover:text-sonic-textPrimary transition-colors">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

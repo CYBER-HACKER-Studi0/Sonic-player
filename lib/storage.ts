@@ -93,6 +93,22 @@ export function getTopTracks(limit = 10): Track[] {
 }
 
 /** Extract genre tags from play history for recommendations */
+export function getFavoriteArtists(limit = 5): string[] {
+  const stats = getPlayStats()
+  const likedIds = new Set(getLikes())
+  const artistScores = new Map<string, number>()
+  for (const record of stats) {
+    const artist = record.track.artist?.trim()
+    if (!artist) continue
+    const score = record.count * (likedIds.has(record.track.id) ? 4 : 1)
+    artistScores.set(artist, (artistScores.get(artist) || 0) + score)
+  }
+  return [...artistScores.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([artist]) => artist)
+}
+
 export function getListeningGenres(): string[] {
   const stats = getPlayStats()
   const genreCount = new Map<string, number>()
@@ -148,33 +164,71 @@ export function clearHistory() {
 
 // ─── Downloads ───
 
+const BACKEND = 'http://localhost:8005'
+const OFFLINE_DB = 'sonic-offline'
+const OFFLINE_STORE = 'audio'
+
+function openOfflineDb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') {
+      reject(new Error('IndexedDB is unavailable'))
+      return
+    }
+    const request = indexedDB.open(OFFLINE_DB, 1)
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(OFFLINE_STORE)) {
+        request.result.createObjectStore(OFFLINE_STORE)
+      }
+    }
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error || new Error('Could not open offline storage'))
+  })
+}
+
+export async function saveOfflineAudio(trackId: string, blob: Blob): Promise<void> {
+  const db = await openOfflineDb()
+  await new Promise<void>((resolve, reject) => {
+    const request = db.transaction(OFFLINE_STORE, 'readwrite').objectStore(OFFLINE_STORE).put(blob, trackId)
+    request.onsuccess = () => resolve()
+    request.onerror = () => reject(request.error || new Error('Could not save offline audio'))
+  })
+  db.close()
+}
+
+export async function getOfflineAudioUrl(trackId: string): Promise<string | null> {
+  try {
+    const db = await openOfflineDb()
+    const blob = await new Promise<Blob | undefined>((resolve, reject) => {
+      const request = db.transaction(OFFLINE_STORE, 'readonly').objectStore(OFFLINE_STORE).get(trackId)
+      request.onsuccess = () => resolve(request.result as Blob | undefined)
+      request.onerror = () => reject(request.error)
+    })
+    db.close()
+    return blob ? URL.createObjectURL(blob) : null
+  } catch {
+    return null
+  }
+}
+
 export function trackDownload(track: Track) {
   const downloads = getDownloads()
-  if (downloads.find(t => t.id === track.id)) return
-  downloads.unshift(track)
+  const idx = downloads.findIndex(t => t.id === track.id)
+  if (idx >= 0) downloads[idx] = { ...downloads[idx], ...track }
+  else downloads.unshift(track)
   localStorage.setItem(KEYS.downloads, JSON.stringify(downloads.slice(0, 50)))
 }
 
-/** Download to folder and update track to play locally */
-const BACKEND = 'http://localhost:8005'
+/** Download audio into browser storage so it can play with no network connection. */
 export async function downloadToFolder(track: Track): Promise<boolean> {
-  if (!track.videoId) return false
+  if (!track.videoId || typeof window === 'undefined') return false
   try {
-    const res = await fetch(`${BACKEND}/download_local/${track.videoId}?title=${encodeURIComponent(track.title)}`)
-    const data = await res.json()
-    if (data.success && data.path) {
-      // Update the track's audio to local path
-      const updatedTrack = { ...track, audio: `${BACKEND}${data.path}`, source: 'Local' as const }
-      // Update in downloads list
-      const downloads = getDownloads()
-      const idx = downloads.findIndex(t => t.id === track.id)
-      if (idx >= 0) {
-        downloads[idx] = updatedTrack
-        localStorage.setItem(KEYS.downloads, JSON.stringify(downloads))
-      }
-      return true
-    }
-    return false
+    const res = await fetch(`${BACKEND}/download/${track.videoId}`)
+    if (!res.ok) return false
+    const blob = await res.blob()
+    if (!blob.size) return false
+    await saveOfflineAudio(track.id, blob)
+    trackDownload({ ...track, audio: `offline://${encodeURIComponent(track.id)}`, source: 'Local' })
+    return true
   } catch {
     return false
   }

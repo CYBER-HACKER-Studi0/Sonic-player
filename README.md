@@ -41,35 +41,28 @@
 
 ---
 
-## 📸 Screenshots
+## Showcase
 
-<div align="center">
-  <table>
-    <tr>
-      <td><img src="promo/clean_home.png" width="400" alt="Home"><br><sub>Home Screen</sub></td>
-      <td><img src="promo/clean_search.png" width="400" alt="Search"><br><sub>Search Results</sub></td>
-    </tr>
-  </table>
-</div>
+### Desktop experience
 
----
+![Sonic Player desktop home screen](promo/clean_home.png)
 
-## 🎬 Promo Video
+![Sonic Player desktop search results](promo/clean_search.png)
 
-<div align="center">
-  <a href="sonic_promo_final.mp4" target="_blank">
-    <img src="promo/clean_home.png" width="720" alt="Click to watch promo video" style="border-radius:12px;border:1px solid rgba(255,255,255,0.1)">
-    <br>
-    <sub>▶️ Click to watch — 40-second promo · 1920×1080</sub>
-  </a>
-  <br><br>
-  <p><b>SONIC PLAYER</b> — Modern music streaming app built with Next.js & Python</p>
-  <p>🔍 Search millions of YouTube tracks · 🧠 AI smart recommendations · 📥 Offline downloads</p>
-  <p>🎨 7 real-time visualizers · 📋 Playlists with album art · 📜 Synced lyrics</p>
-  <p>⚡ Seamless playback with pre-buffering · 📱 Runs on Termux (Android)</p>
-  <br>
-  <sub>✦ by <b>CYBER · HACKER · Studio</b> ✦</sub>
-</div>
+### Marketing poster
+
+![Sonic Player marketing poster](promo/sonic_player_marketing_poster.png)
+
+### PC edition visual
+
+![Sonic Player PC edition keyframe](promo/sonic_pc_video_keyframe.png)
+
+### Promotional videos
+
+- [Open the Sonic Player marketing video](promo/sonic_player_marketing_video.mp4)
+- [Open the original project promo](sonic_promo_final.mp4)
+
+> GitHub displays MP4 files as downloadable media links in the README. The poster and keyframes above provide an immediate visual preview of the product and its desktop identity.
 
 ---
 
@@ -92,9 +85,9 @@
 | Feature | Description |
 |---------|-------------|
 | 🔍 **YouTube Search** | Search millions of tracks. Choose 20–200 results per query |
-| 🧠 **Smart Recommendations** | AI-powered suggestions based on your listening history |
+| 🧠 **Personal Recommendations** | Local recommendations based on listening history, likes, and favorite artists |
 | 🎬 **YouTube Playlists** | Browse channels as auto-generated playlists |
-| 📥 **Offline Downloads** | Save tracks and play them without internet connection |
+| 📥 **Offline Downloads** | Save audio in IndexedDB and play downloaded tracks without internet connection |
 | 📜 **Synced Lyrics** | Auto-scrolling LRC support via LRCLib API |
 
 ### 🎨 Visual & UI
@@ -103,6 +96,7 @@
 | 🎨 **7 Real-Time Visualizers** | Bars, Wave, Circle, Fire, Aurora, Plasma, Rings |
 | 📋 **Playlist Management** | Create & manage playlists with album art thumbnails |
 | ⚡ **Smart Preloader** | Next track buffers while current plays — instant switching |
+| 📱 **Mobile Lite Mode** | Reduced visualizer load, bottom navigation, and responsive layouts for small screens |
 
 ### 📱 Platform Support
 | Feature | Description |
@@ -116,6 +110,7 @@
 ## 🗂️ Table of Contents
 
 - [🚀 Quick Start](#-quick-start)
+- [Showcase](#showcase)
 - [🏗️ Project Structure](#-project-structure)
 - [📄 License](#-license)
 - [🛡️ Privacy Policy](#-privacy-policy)
@@ -194,6 +189,12 @@ Open **http://localhost:3004** in your browser.
 
 ---
 
+## ✅ Quality Status
+
+The current development build passes TypeScript, Next.js production build, Python syntax, API smoke tests, desktop UI checks, mobile layout checks, personal-recommendation checks, and IndexedDB Offline playback checks. YouTube stream extraction can still require optional yt-dlp cookies or browser authentication in restricted environments; the backend reports this as a clear HTTP 503 instead of leaving the player in a loading state.
+
+---
+
 ## 🏗️ Project Structure
 
 ```
@@ -204,7 +205,7 @@ sonic-player/
 │   ├── main.py           # ❌ Deprecated — FastAPI version (no longer used)
 │   └── downloads/        # Offline downloaded files
 ├── lib/                  # State, API, storage, preloader
-├── promo/                # Screenshots for README
+├── promo/                # Screenshots, poster, keyframes, and marketing videos
 ├── PRIVACY.md            # Privacy policy
 ├── LICENSE               # MIT License
 ├── demo.html             # Live demo page

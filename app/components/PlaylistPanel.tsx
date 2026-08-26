@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getPlaylists, createPlaylist, deletePlaylist, getHistory, clearHistory, getDownloads } from '@/lib/storage'
+import { getPlaylists, createPlaylist, deletePlaylist, getHistory, clearHistory, getDownloads, downloadToFolder } from '@/lib/storage'
 import { usePlayerStore } from '@/lib/player-store'
 import type { Playlist } from '@/lib/storage'
 import type { Track } from '@/lib/player-store'
 
-const BACKEND = 'http://localhost:8005'
 
 export default function PlaylistPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [playlists, setPlaylists] = useState<Playlist[]>([])
@@ -38,13 +37,13 @@ export default function PlaylistPanel({ open, onClose }: { open: boolean; onClos
     setDlStatus(`Downloading ${ytTracks.length} tracks...`)
     let done = 0
     for (const t of ytTracks) {
-      try {
-        await fetch(`${BACKEND}/download_local/${t.videoId}?title=${encodeURIComponent(t.title)}`)
+      const ok = await downloadToFolder(t)
+      if (ok) {
         done++
         setDlStatus(`Downloaded ${done}/${ytTracks.length}`)
-      } catch {}
+      }
     }
-    setDlStatus(`✅ ${done} tracks saved to backend/downloads/`)
+    setDlStatus(`Saved ${done}/${ytTracks.length} tracks on this device`)
     setTimeout(() => setDlStatus(null), 3000)
   }
 

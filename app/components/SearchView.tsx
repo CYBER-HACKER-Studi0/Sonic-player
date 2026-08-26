@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { usePlayerStore } from '@/lib/player-store'
 import { searchAll, searchYouTubePlaylists, getUploaderTracks } from '@/lib/api'
 import type { YouTubePlaylist } from '@/lib/api'
-import { toggleLike, isLiked, saveSearchQuery, getSearchCache, trackDownload, downloadToFolder, getPlaylists, addToPlaylist } from '@/lib/storage'
+import { toggleLike, isLiked, saveSearchQuery, getSearchCache, downloadToFolder, getPlaylists, addToPlaylist } from '@/lib/storage'
 import type { Playlist } from '@/lib/storage'
 import { preloadSearchResults } from '@/lib/preloader'
 import VideoModal from './VideoModal'
@@ -103,7 +103,7 @@ export default function SearchView() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="pt-8 pb-6 px-8 sticky top-0 z-10 bg-sonic-base/95 backdrop-blur-xl">
+      <div className="pt-5 md:pt-8 pb-4 md:pb-6 px-4 md:px-8 sticky top-0 z-10 bg-sonic-base/95 backdrop-blur-xl">
         <div className="relative max-w-xl">
           <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-sonic-textMuted" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" />
@@ -163,7 +163,7 @@ export default function SearchView() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 pb-8">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-8">
         {!query && !loading && results.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <svg className="w-16 h-16 text-sonic-textMuted/30 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
@@ -274,7 +274,7 @@ export default function SearchView() {
                     {/* Download */}
                     {track.videoId && (
                       <div className="flex gap-0.5">
-                        <button onClick={(e) => { e.stopPropagation(); downloadToFolder(track).then(ok => { if (ok) trackDownload(track); setLikedState(s => s+1) }) }} className="magnetic p-1 text-sonic-textMuted/30 hover:text-sonic-textPrimary transition-colors" title="Download to folder">
+                        <button onClick={(e) => { e.stopPropagation(); downloadToFolder(track).then(() => setLikedState(s => s + 1)) }} className="magnetic p-1 text-sonic-textMuted/30 hover:text-sonic-textPrimary transition-colors" title="Download to folder">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                         </button>
                       </div>

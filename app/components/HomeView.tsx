@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { usePlayerStore } from '@/lib/player-store'
-import { getDemoTracks, getRecommendations, searchYouTube } from '@/lib/api'
-import { getRecentTracks, getTopTracks, getListeningGenres } from '@/lib/storage'
+import { getDemoTracks, getRecommendations, getArtistRecommendations, searchYouTube } from '@/lib/api'
+import { getRecentTracks, getTopTracks, getListeningGenres, getFavoriteArtists, getDownloads } from '@/lib/storage'
 import type { TrackResult } from '@/lib/api'
 
 const BACKEND = 'http://localhost:8005'
@@ -17,6 +17,8 @@ export default function HomeView() {
   const [topTracks, setTopTracks] = useState<TrackResult[]>([])
   const [recommendations, setRecommendations] = useState<TrackResult[]>([])
   const [recommendLabel, setRecommendLabel] = useState('Recommended for You')
+  const [preferredArtists, setPreferredArtists] = useState<string[]>([])
+  const [offlineDownloads, setOfflineDownloads] = useState<TrackResult[]>([])
   const [hasHistory, setHasHistory] = useState(false)
   
   // Country + Trending
@@ -38,24 +40,33 @@ export default function HomeView() {
     // Load play stats
     const recent = getRecentTracks(8)
     const top = getTopTracks(8)
-    const genres = getListeningGenres()
+      const genres = getListeningGenres()
+    const artists = getFavoriteArtists(3)
+    setOfflineDownloads(getDownloads())
 
-    if (recent.length > 0) {
+      if (recent.length > 0) {
       setHasHistory(true)
       setRecentTracks(recent)
       setTopTracks(top)
 
-      // Get genre-based recommendations
-      const label = genres.length > 0
-        ? `More ${genres[0].charAt(0).toUpperCase() + genres[0].slice(1)}`
-        : 'Discover New Sounds'
-      setRecommendLabel(label)
+      setPreferredArtists(artists)
+      const playedIds = new Set(recent.map(t => t.id))
 
-      getRecommendations(genres, 20).then(res => {
-        // Filter out already played tracks
-        const playedIds = new Set(recent.map(t => t.id))
-        const fresh = res.filter(t => !playedIds.has(t.id))
-        setRecommendations(fresh.length > 0 ? fresh : res)
+      // Prefer artists the user actually listens to, then fall back to genres.
+      getArtistRecommendations(artists, playedIds, 20).then(personalized => {
+        if (personalized.length > 0) {
+          setRecommendLabel(`More from ${artists[0]}`)
+          setRecommendations(personalized)
+          return
+        }
+        const label = genres.length > 0
+          ? `More ${genres[0].charAt(0).toUpperCase() + genres[0].slice(1)}`
+          : 'Discover New Sounds'
+        setRecommendLabel(label)
+        return getRecommendations(genres, 20).then(res => {
+          const fresh = res.filter(t => !playedIds.has(t.id))
+          setRecommendations(fresh.length > 0 ? fresh : res)
+        })
       }).catch(() => {})
     } else {
       // No history — show fallback
@@ -143,10 +154,10 @@ export default function HomeView() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto px-8 pb-32">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-32">
         {/* Hero */}
-        <div className="pt-10 pb-8">
-          <h1 className="font-display text-4xl font-bold text-sonic-textPrimary">
+        <div className="pt-6 md:pt-10 pb-6 md:pb-8">
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-sonic-textPrimary">
             {hasHistory ? 'Welcome back 🎧' : 'Good to hear you'}
           </h1>
           <p className="text-sonic-textMuted mt-2 text-sm">
@@ -154,14 +165,32 @@ export default function HomeView() {
               ? 'Pick up where you left off'
               : 'Discover new sounds'}
           </p>
+          {hasHistory && preferredArtists.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mt-4">
+              <span className="text-[10px] text-sonic-textMuted/50">Your taste:</span>
+              {preferredArtists.map((artist) => (
+                <span key={artist} className="px-2.5 py-1 rounded-full bg-[#e8c547]/10 border border-[#e8c547]/20 text-[10px] text-[#e8c547]/80">
+                  {artist}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
+
+        {offlineDownloads.length > 0 && (
+          <Section title="Available Offline" subtitle="Saved on this device">
+            {offlineDownloads.slice(0, 8).map((track, i) => (
+              <TrackRow key={`offline_${track.id}`} track={track} index={i} tracks={offlineDownloads} label="Offline" />
+            ))}
+          </Section>
+        )}
 
         {hasHistory ? (
           <>
             {/* ─── Recently Played ─── */}
             {recentTracks.length > 0 && (
               <Section title="Recently Played" subtitle="Your latest listens">
-                <div className="grid grid-cols-2 gap-3 mb-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
                   {recentTracks.slice(0, 4).map((track, i) => (
                     <button
                       key={`recent_${track.id}`}
@@ -218,7 +247,7 @@ export default function HomeView() {
             {/* ─── Quick Picks ─── */}
             <div className="mb-10">
               <h2 className="text-sm font-semibold text-sonic-textPrimary mb-4">Quick Picks</h2>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 {featured.map((f, i) => (
                   <button
                     key={i}
@@ -242,7 +271,7 @@ export default function HomeView() {
             {albums.length > 0 && (
               <div className="mb-10">
                 <h2 className="text-sm font-semibold text-sonic-textPrimary mb-4">Albums</h2>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {albums.map((album, i) => (
                     <div key={i} className="glass-card p-3 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#e8c547]/20 to-[#b8962e]/10 flex items-center justify-center shrink-0">

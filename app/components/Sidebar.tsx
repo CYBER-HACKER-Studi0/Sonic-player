@@ -27,9 +27,9 @@ export default function Sidebar({ onOpenSettings, onViewChange, onOpenLibrary }:
   ]
 
   return (
-    <aside className="w-[240px] h-full flex flex-col border-r border-sonic-border shrink-0">
+    <aside className="fixed md:static bottom-0 left-0 right-0 z-40 w-full md:w-[240px] h-16 md:h-full flex items-center md:items-stretch flex-col border-t md:border-t-0 md:border-r border-sonic-border bg-sonic-base/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none shrink-0">
       {/* Logo */}
-      <div className="px-6 pt-8 pb-6">
+      <div className="hidden md:block px-6 pt-8 pb-6">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#e8c547] to-[#b8962e] flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#08090c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -40,12 +40,12 @@ export default function Sidebar({ onOpenSettings, onViewChange, onOpenLibrary }:
         </div>
       </div>
 
-      <nav className="flex-1 px-3 space-y-1">
+      <nav className="flex-1 w-full flex md:block items-center justify-around md:space-y-1 px-1 md:px-3">
         {items.map((item) => (
           <button
             key={item.id}
             onClick={() => nav(item.id, item.id as any)}
-            className={`sidebar-item w-full ${active === item.id ? 'active' : ''}`}
+            className={`sidebar-item flex-1 md:flex-none justify-center md:justify-start w-full ${active === item.id ? 'active' : ''}`}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d={item.icon} />
@@ -55,22 +55,22 @@ export default function Sidebar({ onOpenSettings, onViewChange, onOpenLibrary }:
         ))}
 
         {/* Library Section */}
-        <div className="pt-4 pb-2">
+        <div className="hidden md:block pt-4 pb-2">
           <div className="glow-line" />
         </div>
 
-        <div className="px-4 py-2 text-xs font-medium tracking-wider uppercase text-sonic-textMuted">
+        <div className="hidden md:block px-4 py-2 text-xs font-medium tracking-wider uppercase text-sonic-textMuted">
           <span>My Collection</span>
         </div>
 
-        <button onClick={() => nav('library', 'library')} className="sidebar-item w-full">
+        <button onClick={() => nav('library', 'library')} className="hidden md:flex sidebar-item w-full">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
           </svg>
           <span>Liked Songs</span>
         </button>
 
-        <button onClick={() => nav('library', 'library')} className="sidebar-item w-full">
+        <button onClick={() => nav('library', 'library')} className="hidden md:flex sidebar-item w-full">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
             <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
@@ -79,11 +79,11 @@ export default function Sidebar({ onOpenSettings, onViewChange, onOpenLibrary }:
         </button>
 
         {/* Sources */}
-        <div className="pt-4 pb-2">
+        <div className="hidden md:block pt-4 pb-2">
           <div className="glow-line" />
         </div>
 
-        <button onClick={() => setShowSources(!showSources)} className="sidebar-item w-full">
+        <button onClick={() => setShowSources(!showSources)} className="hidden md:flex sidebar-item w-full">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="3" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
           </svg>
@@ -95,7 +95,7 @@ export default function Sidebar({ onOpenSettings, onViewChange, onOpenLibrary }:
         </button>
 
         {showSources && (
-          <div className="ml-4 space-y-1 animate-spring-in">
+          <div className="hidden md:block ml-4 space-y-1 animate-spring-in">
             <div className="sidebar-item text-xs"><span className="w-2 h-2 rounded-full bg-emerald-400" />Jamendo (CC)</div>
             <div className="sidebar-item text-xs"><span className="w-2 h-2 rounded-full bg-amber-400" />YouTube</div>
             <div className="sidebar-item text-xs"><span className="w-2 h-2 rounded-full bg-sky-400" />Local Files</div>
@@ -103,7 +103,7 @@ export default function Sidebar({ onOpenSettings, onViewChange, onOpenLibrary }:
         )}
       </nav>
 
-      <div className="px-3 pb-6 space-y-1">
+      <div className="hidden md:block px-3 pb-6 space-y-1">
         <div className="glow-line mb-4" />
         <button onClick={() => { const tracks = getDemoTracks(); setQueue(tracks, 0) }} className="sidebar-item w-full text-xs">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="5 3 19 12 5 21 5 3" /></svg>
