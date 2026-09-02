@@ -57,8 +57,8 @@ if pip3 show yt-dlp >/dev/null 2>&1; then
   echo -e "  ${GREEN}✓${NC} yt-dlp found (yt-dlp)"
 else
   echo -e "  ${YELLOW}⚠${NC} yt-dlp not found via pip3 — attempting install..."
-  pip3 install yt-dlp -q
-  if pip3 show yt-dlp >/dev/null 2>&1; then
+  python3 -m pip install yt-dlp -q 2>/dev/null || python3 -m pip install --break-system-packages yt-dlp -q
+  if command -v yt-dlp >/dev/null 2>&1 || python3 -c "import yt_dlp" >/dev/null 2>&1; then
     echo -e "  ${GREEN}✓${NC} yt-dlp installed successfully"
   else
     echo -e "  ${RED}✗${NC} yt-dlp installation failed — backend may not work correctly"

@@ -590,17 +590,16 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
                 if time.time() - entry.get('time', 0) < 7200 and cached_data.get('audio_url'):
                     return self._send_json(cached_data)
 
-        safe_vid = shlex.quote(vid)
         audio_url, rc = self._run_ytdlp([
             '-g', '-f', 'bestaudio[ext=m4a]/bestaudio/best',
             '--no-warnings', '--quiet',
-            f'https://www.youtube.com/watch?v={safe_vid}'
+            f'https://www.youtube.com/watch?v={vid}'
         ], timeout=30)
 
         if not audio_url:
             audio_url, rc = self._run_ytdlp([
                 '-g', '--no-warnings', '--quiet',
-                f'https://www.youtube.com/watch?v={safe_vid}'
+                f'https://www.youtube.com/watch?v={vid}'
             ], timeout=30)
 
         if not audio_url:
@@ -643,16 +642,15 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
                         urls[vid] = cached_url
                         continue
             # Extract
-            safe_vid = shlex.quote(vid)
             audio_url, _ = self._run_ytdlp([
                 '-g', '-f', 'bestaudio[ext=m4a]/bestaudio/best',
                 '--no-warnings', '--quiet',
-                f'https://www.youtube.com/watch?v={safe_vid}'
+                f'https://www.youtube.com/watch?v={vid}'
             ], timeout=30)
             if not audio_url:
                 audio_url, _ = self._run_ytdlp([
                     '-g', '--no-warnings', '--quiet',
-                    f'https://www.youtube.com/watch?v={safe_vid}'
+                    f'https://www.youtube.com/watch?v={vid}'
                 ], timeout=30)
             if audio_url:
                 urls[vid] = audio_url
@@ -675,17 +673,16 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
             if cached_video.get('video_url') and time.time() - cached_video.get('time', 0) < 7200:
                 return self._send_json(cached_video)
 
-        safe_vid = shlex.quote(vid)
         video_url, rc = self._run_ytdlp([
             '-g', '-f', 'best[height<=720]',
             '--no-warnings', '--quiet',
-            f'https://www.youtube.com/watch?v={safe_vid}'
+            f'https://www.youtube.com/watch?v={vid}'
         ], timeout=30)
 
         if not video_url:
             video_url, rc = self._run_ytdlp([
                 '-g', '--no-warnings', '--quiet',
-                f'https://www.youtube.com/watch?v={safe_vid}'
+                f'https://www.youtube.com/watch?v={vid}'
             ], timeout=30)
 
         if not video_url:
@@ -707,11 +704,10 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         if not vid:
             return self._send_error('invalid video id', 400)
 
-        safe_vid = shlex.quote(vid)
         stdout, rc = self._run_ytdlp([
             '--print', 'title', '--print', 'uploader', '--print', 'duration',
             '--no-warnings', '--quiet',
-            f'https://www.youtube.com/watch?v={safe_vid}'
+            f'https://www.youtube.com/watch?v={vid}'
         ], timeout=15)
 
         if rc != 0 or not stdout:
@@ -781,19 +777,18 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         if not vid:
             return self._send_error('invalid video id', 400)
 
-        safe_vid = shlex.quote(vid)
         try:
             payload, returncode = self._run_ytdlp_bytes([
                 '-f', 'bestaudio[ext=m4a]/bestaudio/best',
                 '-o', '-', '--no-warnings', '--quiet',
-                f'https://www.youtube.com/watch?v={safe_vid}'
+                f'https://www.youtube.com/watch?v={vid}'
             ])
             if returncode != 0 or not payload:
                 # Fallback: download without format restriction
                 payload, returncode = self._run_ytdlp_bytes([
                     '-f', 'bestaudio', '-o', '-',
                     '--no-warnings', '--quiet',
-                    f'https://www.youtube.com/watch?v={safe_vid}'
+                    f'https://www.youtube.com/watch?v={vid}'
                 ])
             if returncode != 0 or not payload:
                 return self._send_error(f'download failed (exit: {returncode})', 500)
@@ -824,12 +819,11 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         }
         fmt = quality_map.get(quality, quality_map['best'])
 
-        safe_vid = shlex.quote(vid)
         try:
             payload, returncode = self._run_ytdlp_bytes([
                 '-f', fmt, '-o', '-',
                 '--no-warnings', '--quiet',
-                f'https://www.youtube.com/watch?v={safe_vid}'
+                f'https://www.youtube.com/watch?v={vid}'
             ])
             if returncode != 0 or not payload:
                 return self._send_error(f'video download failed (exit: {returncode})', 500)
@@ -852,12 +846,11 @@ class SonicHandler(http.server.BaseHTTPRequestHandler):
         safe_name = ''.join(c for c in (title or vid) if c.isalnum() or c in ' ._-').strip() or vid
         save_path = os.path.join(DOWNLOADS_DIR, f'{safe_name}_{vid[:8]}.m4a')
 
-        safe_vid = shlex.quote(vid)
         try:
             _, returncode = self._run_ytdlp([
                 '-f', 'bestaudio[ext=m4a]/bestaudio/best', '-o', save_path,
                 '--no-warnings', '--quiet',
-                f'https://www.youtube.com/watch?v={safe_vid}'
+                f'https://www.youtube.com/watch?v={vid}'
             ], timeout=120)
             if returncode == 0 and os.path.exists(save_path):
                 size = os.path.getsize(save_path)
